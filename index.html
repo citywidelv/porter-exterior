@@ -6,12 +6,12 @@
     <title>City Wide Exterior Porter Services Pricing Calculator</title>
     <style>
         :root {
-            --primary-blue: #1E3A8A;
-            --secondary-blue: #3B82F6;
-            --accent-red: #DC2626;
-            --dark-gray: #374151;
-            --light-gray: #F3F4F6;
-            --success-green: #059669;
+            --primary-blue: #a81e26;
+            --secondary-blue: #d22730;
+            --accent-red: #d22730;
+            --dark-gray: #2d2a26;
+            --light-gray: #f5f5f5;
+            --success-green: #0aa6a9;
             --white: #FFFFFF;
         }
 
@@ -22,7 +22,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: Verdana, 'Liberation Sans', 'DejaVu Sans', Geneva, Tahoma, sans-serif;
             background-color: var(--light-gray);
             color: var(--dark-gray);
             line-height: 1.6;
@@ -204,7 +204,7 @@
         }
 
         .ic-breakdown {
-            background: #f8fafc;
+            background: #f5f5f5;
             border: 2px solid var(--secondary-blue);
             border-radius: 8px;
             padding: 1.5rem;
@@ -233,7 +233,7 @@
             border-radius: 8px;
             padding: 1.5rem;
             margin: 1.5rem 0;
-            background: #f1f5f9;
+            background: #f5f5f5;
         }
 
         .scope-section h4 {
@@ -307,15 +307,15 @@
         }
 
         .warning-box {
-            background: #fef3c7;
-            border: 2px solid #f59e0b;
+            background: #fbf2d3;
+            border: 2px solid #e5b423;
             border-radius: 8px;
             padding: 1rem;
             margin: 1rem 0;
         }
 
         .warning-box h5 {
-            color: #92400e;
+            color: #7a6013;
             margin-bottom: 0.5rem;
         }
 
@@ -350,6 +350,8 @@
     </style>
 </head>
 <body>
+<div style="background:#FFFFFF;border-bottom:3px solid #D22730;padding:10px 20px;"><img src="https://emailer.emfluence.com/clients/citywide/uploadedfiles/signature_logo.png" alt="City Wide Facility Solutions" style="height:42px;display:block;max-width:90%;object-fit:contain;object-position:left;"></div>
+
     <div class="header">
         <h1>Exterior Porter Services</h1>
         <p>Professional Pricing Calculator for Property Managers - Nevada</p>
@@ -807,7 +809,7 @@
                     <span>IC Loaded Rate:</span>
                     <span>$${icLoadedRate.toFixed(2)}/hr</span>
                 </div>
-                <div style="margin-top: 1rem; padding: 0.5rem; background: #e0f2fe; border-radius: 4px;">
+                <div style="margin-top: 1rem; padding: 0.5rem; background: #ececec; border-radius: 4px;">
                     <strong>When VENDOR selected:</strong> Using IC Loaded Rate of $${icLoadedRate.toFixed(2)}/hr<br>
                     <strong>When IN-HOUSE selected:</strong> Using Loaded Rate of $${subTotal.toFixed(2)}/hr (no IC profit)
                 </div>
@@ -1314,5 +1316,7 @@ CLIENT COMMUNICATION POINTS:\\par
             updateCalculations();
         });
     </script>
+
+<div style="text-align:center;padding:18px 12px 24px;font-family:Verdana, &#39;Liberation Sans&#39;, &#39;DejaVu Sans&#39;, Geneva, Tahoma, sans-serif;font-size:11px;color:#636466;">City Wide Facility Solutions | <a href="https://www.gocitywide.com" style="color:#D22730;font-weight:bold;">GoCityWide.com</a></div>
 </body>
 </html>
