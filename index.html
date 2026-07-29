@@ -194,7 +194,7 @@ body{
       <div class="cfield"><label>Materials Provided By</label>
         <select id="matProvider" onchange="recalc()">
           <option value="vendor">Crew Provides (their cost + 15%)</option>
-          <option value="cw">City Wide (at our cost)</option>
+          <option value="cw">City Wide Supplies</option>
         </select>
       </div>
       <div class="cfield"><label>Override Margin % (blank = auto by job size)</label>
@@ -221,8 +221,8 @@ body{
           <div id="svcList"></div>
         </div>
         <div class="card" id="shopCard" style="display:none">
-          <h2>Supplies, Vehicle &amp; Pass-Throughs for This Account</h2>
-          <p style="font-size:11.5px;color:var(--cw-grey);margin-bottom:10px">What this account consumes in a year, by item. Liners, ice melt product, vehicle allocations and pass-throughs for the year. Double-check big lines and update the Rate Book if a price moved.</p>
+          <h2>Supplies, Vehicle &amp; Other Cost Lines for This Account</h2>
+          <p style="font-size:11.5px;color:var(--cw-grey);margin-bottom:10px">What this account consumes in a year, by item. Liners, ice melt product, vehicle allocations and other cost lines for the year. Double-check big lines and update the Rate Book if a price moved.</p>
           <div id="shopList"></div>
         </div>
       </div>
@@ -307,7 +307,7 @@ const DEFAULT_RB={
  vehVisit:{v:6,   label:'Route vehicle $ per visit (fuel, wear, insurance)', note:'IRS 2026 mileage runs $0.75/mi. Ten to fifteen urban miles between stops.'},
  iceMin:  {v:4,   label:'Ice melt minutes per entry per application', note:'NNV winter service, entries and door aprons only.'},
  iceProd: {v:2.50,label:'Ice melt product $ per entry per application', note:'Verify against bag price by the pallet each fall.'},
- haulHrs: {v:1.5, label:'Crew hours per bulk item haul', note:'Load, secure, drive, tip. Dump fees pass through at cost on top.'}
+ haulHrs: {v:1.5, label:'Crew hours per bulk item haul', note:'Load, secure, drive, tip. Dump fees go in the cost box on the service.'}
 };
 
 /* Equipment $/crew-hour by kind (blower, cart, grabbers, PPE amortized; truck priced per visit in the Rate Book) */
@@ -327,7 +327,7 @@ const DEBRIS=[['0.85','Office park (light debris)'],['1','Retail center (moderat
 /* ---------- SERVICES ---------- */
 const SERVICES=[
  {id:'route', name:'Route Visit Program', sub:'A porter truck stops by on a schedule: litter pass, cans, corrals, entries. The bread and butter', ico:'route', mode:'monthly', wageKey:'porter', equip:EQUIP.route,
-  flatLabel:'Flat Pass-Through $/yr (gate keys, badging, extra disposal)',
+  flatLabel:'Other Costs $/yr (gate keys, badging, extra disposal)',
   desc:'Scheduled route visits: full litter pass of the lot, sidewalks and beds, exterior trash cans emptied and relined, dumpster corrals policed with doors checked, entry and butt-can zones hand-picked, and a photo log on every stop. The right model for most properties: coverage without paying for idle hours.',
   fields:[
    {k:'acres',label:'Maintained Acres',src:'map',ph:'0',small:'Lot, walks and beds the porter covers. Trace it on Google Earth.'},
@@ -360,7 +360,7 @@ const SERVICES=[
      detail:visitMin.toFixed(0)+' min per visit ('+(visitMin-RB.arriveMin.v).toFixed(0)+' min work + '+RB.arriveMin.v+' min arrival) x '+visits+' visits/yr + '+driveHrs.toFixed(0)+' hrs/yr drive time'};
   }},
  {id:'dedicated', name:'Dedicated On-Site Porter', sub:'Your porter, on the property, on a shift. Class A retail, campuses, big centers', ico:'porter', mode:'monthly', wageKey:'porter', equip:EQUIP.dedicated,
-  flatLabel:'Flat Pass-Through $/yr (badging, parking, uniforms beyond standard)',
+  flatLabel:'Other Costs $/yr (badging, parking, uniforms beyond standard)',
   desc:'A dedicated porter on a set shift: continuous litter policing, cans and corrals, spill response, cart corrals, cobwebs and door glass, and eyes on the property all shift with photo reporting. The model for Class A retail, resort-adjacent centers, and campuses where presence is the product.',
   fields:[
    {k:'porters',label:'Porters on Shift',src:'ask',ph:'1',small:''},
@@ -379,7 +379,7 @@ const SERVICES=[
      detail:porters+' porter'+(porters>1?'s':'')+' x '+hrsDay+' hrs/day x '+daysWk+' days/wk = '+Math.round(manHrs/12)+' hrs/mo'};
   }},
  {id:'storm', name:'Storm & Monsoon Debris Pass', sub:'After-storm cleanup: fronds, mud, scattered trash. LV monsoon season, NNV wind events', ico:'storm', mode:'peryear', wageKey:'porter', equip:EQUIP.storm,
-  flatLabel:'Extra Disposal $/yr (at cost)',
+  flatLabel:'Extra Disposal $/yr (enter our cost)',
   desc:'A scheduled allowance for after-storm passes: palm fronds and branches, mud at drive aprons, scattered dumpster overflow, wind-blown debris on the fence lines. Sold as an included number of passes with a cap; a real storm blowout beyond the cap quotes as time and materials.',
   fields:[
    {k:'events',label:'Storm Passes per Year',src:'ask',type:'select',opts:[[4,'4 (LV monsoon standard)'],[2,'2'],[6,'6 (exposed / desert edge)'],[8,'8']],small:'Mid-June through September is monsoon season in LV. NNV gets wind events year-round.'},
@@ -395,8 +395,8 @@ const SERVICES=[
      detail:events+' passes x '+crewHrs+' crew-hrs.'};
   }},
  {id:'icemelt', name:'Entry Ice Melt Service (NNV)', sub:'Doors and walk aprons salted before opening. November through March', ico:'ice', mode:'peryear', wageKey:'porter', equip:EQUIP.ice,
-  flatLabel:'Flat Pass-Through $/yr',
-  desc:'Winter mornings in Reno, Sparks and Carson: ice melt applied at entries, door aprons and walk transitions before the property opens, with a photo log that doubles as slip-and-fall documentation. Product billed through the build-up. Plowing and full de-icing stay with the snow contractor.',
+  flatLabel:'Other Costs $/yr',
+  desc:'Winter mornings in Reno, Sparks and Carson: ice melt applied at entries, door aprons and walk transitions before the property opens, with a photo log that doubles as slip-and-fall documentation. Product prices through the build-up. Plowing and full de-icing stay with the snow contractor.',
   fields:[
    {k:'entries',label:'Entries / Door Aprons',src:'walk',ph:'0',small:'Count doors the public uses, plus ramps.'},
    {k:'apps',label:'Applications per Season',src:'ask',type:'select',opts:[[20,'20 (standard Reno winter)'],[30,'30 (heavy / Carson)'],[10,'10 (light)']],small:'Freeze mornings, not calendar days.'}
@@ -411,9 +411,9 @@ const SERVICES=[
      rateOvQty:entries*apps, rateOvLabel:'Price per Entry-App Override $',
      detail:entries+' entries x '+apps+' applications. Verify product price by the pallet each fall.'};
   }},
- {id:'hauls', name:'Bulk Item & Illegal Dump Hauls', sub:'Mattresses, pallets, tenant dump-outs. Per haul, dump fees at cost', ico:'haul', mode:'peryear', wageKey:'porter', equip:EQUIP.haul,
-  flatLabel:'Dump Fees $/yr (at cost)',
-  desc:'The mattress by the dumpster and the pallet stack behind the pad building. Priced as an annual allowance of hauls so the property manager stops getting nickeled: load, secure, drive, tip, photo. Dump fees pass through at cost. Hazmat, tires and appliances with refrigerant quote separately.',
+ {id:'hauls', name:'Bulk Item & Illegal Dump Hauls', sub:'Mattresses, pallets, tenant dump-outs. Priced per haul', ico:'haul', mode:'peryear', wageKey:'porter', equip:EQUIP.haul,
+  flatLabel:'Dump Fees $/yr (enter our cost)',
+  desc:'The mattress by the dumpster and the pallet stack behind the pad building. Priced as an annual allowance of hauls so the property manager stops getting nickeled: load, secure, drive, tip, photo. Enter dump fees and the tool prices them with the haul. Hazmat, tires and appliances with refrigerant quote separately.',
   fields:[
    {k:'hauls',label:'Hauls per Year (estimate)',src:'ask',ph:'6',small:'Ask the PM how often junk shows up. Retail with alley access runs high.'}
   ],
@@ -423,10 +423,10 @@ const SERVICES=[
    return {manHrs, matLines:[], extraLines:[], equipHrs:manHrs, events:hauls,
      unitQty:hauls, unitName:'haul', unitDiv:1, mktLo:50, mktHi:150,
      rateOvQty:hauls, rateOvLabel:'Price per Haul Override $',
-     detail:hauls+' hauls x '+RB.haulHrs.v+' crew-hrs each. Dump fees ride on top at cost.'};
+     detail:hauls+' hauls x '+RB.haulHrs.v+' crew-hrs each. Dump fees price through the margin chain.'};
   }},
  {id:'firstclean', name:'First Clean / Takeover Catch-Up', sub:'Get a neglected property back to route-maintainable before the contract starts', ico:'broom', mode:'once', wageKey:'porter', equip:EQUIP.clean,
-  flatLabel:'Dump Fees + Bin $ (at cost)',
+  flatLabel:'Dump Fees + Bin $ (enter our cost)',
   desc:'The catch-up push before a takeover: fence lines, landscape beds full of wind litter, overflowing corrals, cobwebs and gum buildup at entries. Sell it as its own project so the route starts from maintainable instead of eating months of catch-up.',
   fields:[
    {k:'hrs',label:'Estimated Crew Hours',src:'walk',ph:'0',small:'Walk it and estimate honestly. A neglected 3-acre center commonly runs 12-24 crew-hours.'}
@@ -472,7 +472,7 @@ function priceService(s){
   /* 3. supplies & product */
   const matCost=c.matLines.reduce((a,m)=>a+m.cost,0);
 
-  /* 4. equipment + vehicle + flat pass-throughs (pass-throughs at cost, no margin) */
+  /* 4. equipment + vehicle + flat cost lines (entered at our cost, margined like everything else) */
   const equipRate=num(st.equip,s.equip);
   const equipCost=c.equipHrs*equipRate;
   const extraCost=(c.extraLines||[]).reduce((a,m)=>a+m.cost,0);
@@ -482,24 +482,25 @@ function priceService(s){
   const matProvider=$('matProvider').value;
   const vendorMat=matProvider==='vendor'?matCost*(1+VENDOR_MAT_MARKUP):0;
   const cwMat=matProvider==='cw'?matCost:0;
-  const vendorBase=laborCost+incCost+equipCost+extraCost+vendorMat;
+  const vendorBase=laborCost+incCost+equipCost+extraCost+vendorMat+flatCost;
   const inhouse=($('laborBy')&&$('laborBy').value==='inhouse');
   const vendorCost=inhouse?vendorBase:vendorBase/(1-IC_MARGIN);
   const totalCost=vendorCost+cwMat;
 
-  /* 6. City Wide margin + regional multiplier. Pass-throughs ride at cost. */
+  /* 6. City Wide margin + regional multiplier. Every cost line rides the full margin chain. */
   const ov=parseFloat($('ovMargin').value);
   const svcOv=parseFloat(st.margin);
   const margin=(!isNaN(svcOv)&&svcOv>0)?svcOv:(!isNaN(ov)&&ov>0)?ov:autoMargin(c.manHrs);
-  let price=totalCost/(1-margin/100)*region.mult+flatCost;
+  const flatPriced=(inhouse?flatCost:flatCost/(1-IC_MARGIN))/(1-margin/100)*region.mult;
+  let price=totalCost/(1-margin/100)*region.mult;
   let floored=false;
-  if(c.minVisitFloor&&c.visits){const fl=c.visits*RB.minVisit.v*region.mult+flatCost; if(price<fl){price=fl;floored=true;}}
+  if(c.minVisitFloor&&c.visits){const fl=c.visits*RB.minVisit.v*region.mult+flatPriced; if(price<fl){price=fl;floored=true;}}
   const rateOv=parseFloat(st.rateOv);
-  if(!isNaN(rateOv)&&rateOv>0){price=rateOv*(c.rateOvQty||1)+flatCost;floored=false;}
-  const perUnit=c.unitQty?((price-flatCost)/(c.unitDiv||1))/c.unitQty:0;
+  if(!isNaN(rateOv)&&rateOv>0){price=rateOv*(c.rateOvQty||1)+flatPriced;floored=false;}
+  const perUnit=c.unitQty?((price-flatPriced)/(c.unitDiv||1))/c.unitQty:0;
   const mktLo=c.mktLo*region.mult, mktHi=c.mktHi*region.mult;
   const monthly=s.mode==='monthly'?price/12:0;
-  return {s,st,c,wage,laborCost,incCost,matCost,vendorMat,cwMat,equipCost,equipRate,extraCost,flatCost,vendorBase,vendorCost,inhouse,totalCost,margin,price,monthly,perUnit,mktLo,mktHi,floored};
+  return {s,st,c,wage,laborCost,incCost,matCost,vendorMat,cwMat,equipCost,equipRate,extraCost,flatCost,flatPriced,vendorBase,vendorCost,inhouse,totalCost,margin,price,monthly,perUnit,mktLo,mktHi,floored};
 }
 function activeResults(){return SERVICES.filter(s=>S.svcOn[s.id]).map(priceService).filter(Boolean);}
 function applyMinimums(results){
@@ -549,7 +550,7 @@ function renderServices(){
       +s.fields.map(f=>fieldHtml(s,f,st)).join('')
       +'<div class="field"><label>Porter Wage $/hr'+srcTag('ask')+'</label><input type="number" step="0.5" value="'+(st.wage||'')+'" placeholder="'+region.wages[s.wageKey].toFixed(2)+'" onchange="setSvc(\''+s.id+'\',\'wage\',this.value)"><small>What the crew actually pays. Prepopulated for '+region.label+' from 2026 postings. Route drivers and working leads run $24-28.</small></div>'
       +'<div class="field"><label>Equipment $/hr</label><input type="number" step="0.5" value="'+(st.equip||'')+'" placeholder="'+s.equip+'" onchange="setSvc(\''+s.id+'\',\'equip\',this.value)"><small>Blower, cart, grabbers, PPE amortized.</small></div>'
-      +'<div class="field"><label>'+s.flatLabel+'</label><input type="number" step="10" value="'+(('flat' in st)?st.flat:'')+'" placeholder="0" onchange="setSvc(\''+s.id+'\',\'flat\',this.value)"><small>Billed at cost. Margin applies to work, not dump fees and badges.</small></div>'
+      +'<div class="field"><label>'+s.flatLabel+'</label><input type="number" step="10" value="'+(('flat' in st)?st.flat:'')+'" placeholder="0" onchange="setSvc(\''+s.id+'\',\'flat\',this.value)"><small>Enter what it costs us. The tool prices margin on this line like everything else.</small></div>'
       +'<div class="field"><label>'+(r?r.c.rateOvLabel:'Price Override $')+'</label><input type="number" step="0.01" value="'+(st.rateOv||'')+'" placeholder="auto build-up" onchange="setSvc(\''+s.id+'\',\'rateOv\',this.value)"></div>'
       +'<div class="field"><label>Service Margin % Override</label><input type="number" value="'+(st.margin||'')+'" placeholder="auto '+(r?r.margin:'32-40')+'" onchange="setSvc(\''+s.id+'\',\'margin\',this.value)"></div>'
       +'</div>';
@@ -563,12 +564,12 @@ function renderServices(){
         +(r.vendorMat&&r.matCost?'<div class="bl"><span>Crew procurement markup on supplies ('+(VENDOR_MAT_MARKUP*100)+'%)</span><b>'+money(r.vendorMat-r.matCost)+'</b></div>':'')
         +(r.c.extraLines||[]).map(m=>'<div class="bl"><span>'+m.label+'</span><b>'+money(m.cost)+'</b></div>').join('')
         +'<div class="bl"><span>Equipment fee ('+r.c.equipHrs.toFixed(1)+' hrs @ $'+r.equipRate+'/hr)</span><b>'+money(r.equipCost)+'</b></div>'
+        +(r.flatCost?'<div class="bl"><span>Other costs (margin applies)</span><b>'+money(r.flatCost)+'</b></div>':'')
         +(r.inhouse?'':'<div class="bl"><span>Crew company margin ('+(IC_MARGIN*100).toFixed(0)+'% of their check, Bid Calculator math)</span><b>'+money(r.vendorCost-r.vendorBase)+'</b></div>')
         +'<div class="bl tot"><span>'+(r.inhouse?'In-house crew cost':'We pay the crew')+(r.cwMat?' (City Wide supplies product: '+money(r.cwMat)+')':'')+'</span><b>'+money(r.totalCost)+'</b></div>'
-        +(r.flatCost?'<div class="bl"><span>Pass-through at cost</span><b>'+money(r.flatCost)+'</b></div>':'')
         +'<div class="bl tot" style="color:var(--cw-red)"><span>'+(r.s.mode==='monthly'?'Annual @ '+r.margin+'% margin x '+REGIONS[$('region').value].mult.toFixed(2)+' regional = '+money(r.price)+'</span><b>'+money(r.price/12)+'/mo</b>':'Client price @ '+r.margin+'% margin x '+REGIONS[$('region').value].mult.toFixed(2)+' regional</span><b>'+money(r.price)+(r.s.mode==='peryear'?'/yr':'')+'</b>')+'</div>'
         +(r.floored?'<div class="bl mkt"><span>Cost build-up came in under the per-visit floor. Priced at '+money2(RB.minVisit.v)+'/visit: type a per-visit override to price it differently.</span></div>':'')
-        +(r.c.visits?'<div class="bl mkt"><span>Per visit: '+money2((r.price-r.flatCost)/r.c.visits)+'</span></div>':'')
+        +(r.c.visits?'<div class="bl mkt"><span>Per visit: '+money2(r.price/r.c.visits)+'</span></div>':'')
         +'<div class="bl mkt"><span>2026 market check: '+money2(r.mktLo)+'-'+money2(r.mktHi)+' per '+r.c.unitName+' here (this quote: '+money2(r.perUnit)+'). '+flag+'</span></div>'
         +'</div>';
       }
@@ -599,7 +600,7 @@ function howTo(s){
    storm:'<h4>Selling it right</h4><p>Put a fixed number of passes in the contract with a cap. After a named storm or a blowout beyond the cap, quote time and materials. The property manager gets a budget number, we do not eat a hundred-year monsoon.</p>',
    icemelt:'<h4>The winter pitch</h4><p>The photo log is the product: timestamped proof the entries were treated before opening. That documentation is what a property manager shows the insurance carrier after a slip claim. Plowing and lot de-icing stay with the snow contractor: this service is doors and walks only.</p>',
    hauls:'<h4>Scope protection</h4><p>Keep it porter work: mattresses, pallets, furniture, boxed junk. Hazmat, tires, refrigerant appliances and construction debris quote separately. Hauling as a business of its own carries a different workers comp class, so the crew doing it as an occasional add-on to porter service is the right structure.</p>',
-   firstclean:'<h4>Scoping the takeover</h4><ol><li>Walk the whole property including the fence lines and the back of the pads.</li><li>Estimate crew hours honestly. A neglected 3-acre center commonly runs 12-24.</li><li>Get dump fees as a pass-through number.</li></ol><div class="warnbox">Never fold catch-up into the monthly. The route price assumes a maintainable property. Sell the first clean as a project and the route starts clean for both sides.</div>'
+   firstclean:'<h4>Scoping the takeover</h4><ol><li>Walk the whole property including the fence lines and the back of the pads.</li><li>Estimate crew hours honestly. A neglected 3-acre center commonly runs 12-24.</li><li>Get dump fees on the walk: they go in the cost box and price like everything else.</li></ol><div class="warnbox">Never fold catch-up into the monthly. The route price assumes a maintainable property. Sell the first clean as a project and the route starts clean for both sides.</div>'
   };
   return H[s.id]?'<details class="howto"><summary>How to measure &amp; quote this</summary><div class="hbody">'+H[s.id]+'</div></details>':'';
 }
@@ -610,7 +611,7 @@ function renderShopping(results){
   results.forEach(r=>{
     r.c.matLines.forEach(m=>items.push({svc:r.s.name,label:m.label,cost:m.cost}));
     (r.c.extraLines||[]).forEach(m=>items.push({svc:r.s.name,label:m.label,cost:m.cost}));
-    if(r.flatCost)items.push({svc:r.s.name,label:'Pass-through (at cost)',cost:r.flatCost});
+    if(r.flatCost)items.push({svc:r.s.name,label:'Other costs (margin applies)',cost:r.flatCost});
   });
   if(!items.length){$('shopCard').style.display='none';return;}
   $('shopCard').style.display='';
@@ -767,7 +768,7 @@ function renderRates(){
   +'<tr><td>Crew company margin</td><td>'+(IC_MARGIN*100)+'%</td><td>Margin basis, cost divided by 0.92: the crew keeps 8% of their check, exactly like the Bid Calculator IC margin line.</td></tr>'
   +'<tr><td>City Wide margin</td><td>32-40%</td><td>Auto by annual job hours, divide basis. Override with a reason.</td></tr>'
   +'<tr><td>Monthly minimum</td><td>'+money(MIN_MONTHLY)+'/mo</td><td>Plus a '+money(RB.minVisit.v)+' floor per route visit. Override needs a reason (bundled account).</td></tr>'
-  +'<tr><td>Pass-throughs</td><td>At cost</td><td>Dump fees, badging, extra disposal: no margin on fees.</td></tr>'
+  +'<tr><td>Other costs (dump fees, badging, disposal)</td><td>Margin applies</td><td>Entered at our cost and priced through the same chain as labor.</td></tr>'
   +'<tr><td>Crew-provided supplies markup</td><td>'+(VENDOR_MAT_MARKUP*100)+'%</td><td>Their procurement cost when the crew supplies liners and product.</td></tr></table>'
   +'<h2>Where These Numbers Come From</h2>'
   +'<table><tr><th>Source</th><th>What it feeds</th></tr>'
@@ -809,8 +810,8 @@ function printQuote(internal){
       +r.c.matLines.map(m=>'<tr><td>'+m.label+'</td><td>'+money(m.cost)+'</td></tr>').join('')
       +(r.c.extraLines||[]).map(m=>'<tr><td>'+m.label+'</td><td>'+money(m.cost)+'</td></tr>').join('')
       +'<tr><td>Equipment fee ('+r.c.equipHrs.toFixed(1)+' hrs @ $'+r.equipRate+'/hr)</td><td>'+money(r.equipCost)+'</td></tr>'
+      +(r.flatCost?'<tr><td>Other costs (margin applies)</td><td>'+money(r.flatCost)+'</td></tr>':'')
       +'<tr><td><b>'+(r.inhouse?'In-house crew cost':'Crew company total (8% margin basis, Bid Calculator math)')+'</b></td><td><b>'+money(r.totalCost)+'</b></td></tr>'
-      +(r.flatCost?'<tr><td>Pass-through at cost</td><td>'+money(r.flatCost)+'</td></tr>':'')
       +'<tr><td><b>Margin '+r.margin+'% | Regional x'+region.mult.toFixed(2)+' | '+money2(r.perUnit)+' per '+r.c.unitName+' (market '+money2(r.mktLo)+'-'+money2(r.mktHi)+')</b></td><td><b>'+money(r.price)+'</b></td></tr></table>';
     }
     return x+'</div>';
@@ -828,7 +829,7 @@ function printQuote(internal){
   if(enhAnnual)h+='<div class="p-total" style="font-size:13px;border-top:none;margin-top:4px;padding-top:0"><span>Extras Program</span><span>'+money(enhAnnual)+'/yr</span></div>';
   if(internal&&$('minOverride').checked)h+='<div class="p-note"><b>Minimum override active.</b> Reason: '+($('minReason').value||'not stated')+'</div>';
   h+='<div class="p-note">'+(internal
-    ?'Internal document. Rate factors match the Bid Calculator: 15% burden, 4% incidentals, 8% crew margin (divide basis). Pass-throughs at cost. Prepared by '+($('prepBy').value||S.user||'')+'.'
+    ?'Internal document. Rate factors match the Bid Calculator: 15% burden, 4% incidentals, 8% crew margin (divide basis), City Wide margin on every cost line. Prepared by '+($('prepBy').value||S.user||'')+'.'
     :'City Wide Facility Solutions manages your exterior program with trained crews, a written heat and safety plan, and a timestamped photo log on every visit. GoCityWide.com')+'</div>';
   $('printArea').innerHTML=h;
   window.print();
