@@ -171,6 +171,7 @@ body{
     <div class="hdr-actions">
       <button class="hdr-btn" id="userBtn" onclick="changeUser()">Set Your Name</button>
       <button class="hdr-btn" onclick="openSaves()">Saved Work</button>
+      <button class="hdr-btn" onclick="resetAll()">Clear All Fields</button>
     </div>
   </div>
   <div class="tabs">
@@ -283,14 +284,15 @@ function money2(n){return '$'+n.toFixed(2)}
 function num(v,d){const x=parseFloat(v);return isNaN(x)?d:x}
 
 /* ---------- REGIONS (porter wages: BLS OEWS May 2025 + July 2026 job boards; postings run below the OEWS janitor median) ---------- */
+/* July 29, 2026 pay policy update: crew wages raised - crews $25+/hr, technical trades higher, supervisors default $35/hr (editable per service). */
 const REGIONS={
-  lv:   {label:'Las Vegas', mult:1.00, wages:{porter:16.0},
+  lv:   {label:'Las Vegas', mult:1.00, wages:{porter:25.0},
          note:'Competitive baseline. Summer routes run early morning: the Nevada OSHA heat rule (enforced since April 2025) requires a written heat plan, water and rest breaks. Wind pushes litter to fence lines and desert edges.'},
-  reno: {label:'Reno / Sparks', mult:1.10, wages:{porter:16.5},
+  reno: {label:'Reno / Sparks', mult:1.10, wages:{porter:25.5},
          note:'Northern Nevada premium: tighter labor pool and fewer route vendors. Winter adds entry ice-melt service and slip-and-fall photo logs. Leaf fall spikes stop times in October and November.'},
-  carson:{label:'Carson City', mult:1.10, wages:{porter:16.5},
+  carson:{label:'Carson City', mult:1.10, wages:{porter:25.5},
          note:'Same band as Reno with a harder freeze and an earlier winter. Ice melt season starts in November.'},
-  tric: {label:'TRIC / USA Parkway', mult:1.18, wages:{porter:18.0},
+  tric: {label:'TRIC / USA Parkway', mult:1.18, wages:{porter:27.0},
          note:'Industrial corridor: big lots, wind-blown debris on the fence lines, and long deadhead between stops. Almost nobody runs routes out here. Trip time is real cost: price it.'}
 };
 
@@ -314,6 +316,7 @@ const DEFAULT_RB={
 const EQUIP={dedicated:1.5, route:2, storm:3, ice:2, haul:8, clean:4};
 
 /* Rate factors, aligned to Bid Calculator Step 1b */
+const SUP_WAGE=35;      /* working supervisor default $/hr, editable on every service */
 const BURDEN=0.15;        /* payroll burden on wages */
 const INCIDENTALS=0.04;   /* room for what we are not considering: 4% of labor */
 const IC_MARGIN=0.08;     /* crew company margin, divide basis: cost / (1 - 8%), same math as the Bid Calculator */
@@ -464,7 +467,14 @@ function priceService(s){
 
   /* 1. raw labor + payroll burden */
   const wage=num(st.wage,region.wages[s.wageKey]);
-  const laborCost=c.manHrs*wage*(1+BURDEN);
+  const techLabor=c.manHrs*wage*(1+BURDEN);
+  const crewN=Math.max(1,Math.round(num(st.crewN,1)));
+  const clockHrs=c.manHrs/crewN;
+  const supN=Math.max(0,Math.round(num(st.sup,0)));
+  const supWage=num(st.supWage,SUP_WAGE);
+  const supHrs=supN*clockHrs;
+  const supCost=supHrs*supWage*(1+BURDEN);
+  const laborCost=techLabor+supCost;
 
   /* 2. incidentals: room for what nobody itemized */
   const incCost=laborCost*INCIDENTALS;
@@ -500,7 +510,7 @@ function priceService(s){
   const perUnit=c.unitQty?((price-flatPriced)/(c.unitDiv||1))/c.unitQty:0;
   const mktLo=c.mktLo*region.mult, mktHi=c.mktHi*region.mult;
   const monthly=s.mode==='monthly'?price/12:0;
-  return {s,st,c,wage,laborCost,incCost,matCost,vendorMat,cwMat,equipCost,equipRate,extraCost,flatCost,flatPriced,vendorBase,vendorCost,inhouse,totalCost,margin,price,monthly,perUnit,mktLo,mktHi,floored};
+  return {s,st,c,wage,laborCost,techLabor,crewN,clockHrs,supN,supWage,supHrs,supCost,incCost,matCost,vendorMat,cwMat,equipCost,equipRate,extraCost,flatCost,flatPriced,vendorBase,vendorCost,inhouse,totalCost,margin,price,monthly,perUnit,mktLo,mktHi,floored};
 }
 function activeResults(){return SERVICES.filter(s=>S.svcOn[s.id]).map(priceService).filter(Boolean);}
 function applyMinimums(results){
@@ -548,6 +558,9 @@ function renderServices(){
     if(on){
       body='<div class="svc-grid">'
       +s.fields.map(f=>fieldHtml(s,f,st)).join('')
+      +'<div class="field"><label>Crew Members on This Service'+srcTag('ask')+'</label><input type="number" min="1" step="1" value="'+(st.crewN||'')+'" placeholder="1" onchange="setSvc(\''+s.id+'\',\'crewN\',this.value)"><small>How many crew members are present for this work. Sets the on-site clock hours shown in the build-up.</small></div>'
+      +'<div class="field"><label>Supervisors on Site'+srcTag('ask')+'</label><input type="number" min="0" step="1" value="'+(st.sup||'')+'" placeholder="0" onchange="setSvc(\''+s.id+'\',\'sup\',this.value)"><small>On-site supervisor billed for the crew clock time. Leave 0 for none.</small></div>'
+      +'<div class="field"><label>Supervisor $/hr'+srcTag('ask')+'</label><input type="number" step="0.5" value="'+(st.supWage||'')+'" placeholder="'+SUP_WAGE.toFixed(2)+'" onchange="setSvc(\''+s.id+'\',\'supWage\',this.value)"></div>'
       +'<div class="field"><label>Porter Wage $/hr'+srcTag('ask')+'</label><input type="number" step="0.5" value="'+(st.wage||'')+'" placeholder="'+region.wages[s.wageKey].toFixed(2)+'" onchange="setSvc(\''+s.id+'\',\'wage\',this.value)"><small>What the crew actually pays. Prepopulated for '+region.label+' from 2026 postings. Route drivers and working leads run $24-28.</small></div>'
       +'<div class="field"><label>Equipment $/hr</label><input type="number" step="0.5" value="'+(st.equip||'')+'" placeholder="'+s.equip+'" onchange="setSvc(\''+s.id+'\',\'equip\',this.value)"><small>Blower, cart, grabbers, PPE amortized.</small></div>'
       +'<div class="field"><label>'+s.flatLabel+'</label><input type="number" step="10" value="'+(('flat' in st)?st.flat:'')+'" placeholder="0" onchange="setSvc(\''+s.id+'\',\'flat\',this.value)"><small>Enter what it costs us. The tool prices margin on this line like everything else.</small></div>'
@@ -558,7 +571,9 @@ function renderServices(){
         const flag=r.perUnit>=r.mktLo&&r.perUnit<=r.mktHi?'<span class="mktflag ok">inside market range</span>':(r.perUnit<r.mktLo?'<span class="mktflag warn">below market, room to hold price</span>':'<span class="mktflag warn">above market, check inputs or expect pushback</span>');
         body+='<div class="buildup">'
         +(r.c.detail?'<div class="bl mkt"><span>'+r.c.detail+'</span></div>':'')
-        +'<div class="bl"><span>Porter labor: '+r.c.manHrs.toFixed(1)+' hrs/yr @ $'+r.wage.toFixed(2)+' + '+(BURDEN*100)+'% payroll burden</span><b>'+money(r.laborCost)+'</b></div>'
+        +'<div class="bl"><span>Porter labor: '+r.c.manHrs.toFixed(1)+' hrs/yr @ $'+r.wage.toFixed(2)+' + '+(BURDEN*100)+'% payroll burden</span><b>'+money(r.techLabor)+'</b></div>'
+        +'<div class="bl"><span>Crew on site: '+r.crewN+' crew'+(r.supN?' + '+r.supN+' supervisor':'')+', about '+r.clockHrs.toFixed(1)+' clock hrs/yr</span><b></b></div>'
+        +(r.supN?'<div class="bl"><span>Supervisor: '+r.supHrs.toFixed(1)+' hrs @ $'+r.supWage.toFixed(2)+' + '+(BURDEN*100)+'% burden</span><b>'+money(r.supCost)+'</b></div>':'')
         +'<div class="bl"><span>Incidentals &amp; unlisted supplies ('+(INCIDENTALS*100)+'% of labor)</span><b>'+money(r.incCost)+'</b></div>'
         +r.c.matLines.map(m=>'<div class="bl"><span>'+m.label+'</span><b>'+money(m.cost)+'</b></div>').join('')
         +(r.vendorMat&&r.matCost?'<div class="bl"><span>Crew procurement markup on supplies ('+(VENDOR_MAT_MARKUP*100)+'%)</span><b>'+money(r.vendorMat-r.matCost)+'</b></div>':'')
@@ -650,7 +665,7 @@ function recalc(){
   $('enhTotal').innerHTML='+ '+money(enhAnnual)+' extras = <b>'+money(annualValue)+'/yr account value</b>';
   const siteHrs=results.reduce((a,r)=>a+(r.s.mode==='monthly'?(r.c.onsiteHrs!==undefined?r.c.onsiteHrs:r.c.manHrs):0),0);
   $('mPerAcre').textContent=siteHrs>0?money2(adjMonthly*12/siteHrs):'$0';
-  const totHrs=results.reduce((a,r)=>a+r.c.manHrs,0);
+  const totHrs=results.reduce((a,r)=>a+r.c.manHrs+(r.supHrs||0),0);
   $('mHours').textContent=Math.round(totHrs).toLocaleString();
   $('mSvcs').textContent=results.length;
   $('minRow').style.display=minMsg?'':'none';
@@ -805,7 +820,8 @@ function printQuote(internal){
     if(r.c.detail)x+='<p style="color:var(--cw-grey)">'+r.c.detail+'</p>';
     if(internal){
       x+='<table class="p-table"><tr><th>Cost Line</th><th>Amount</th></tr>'
-      +'<tr><td>Porter labor '+r.c.manHrs.toFixed(1)+' hrs @ $'+r.wage.toFixed(2)+' +'+(BURDEN*100)+'% burden</td><td>'+money(r.laborCost)+'</td></tr>'
+      +'<tr><td>Porter labor '+r.c.manHrs.toFixed(1)+' hrs @ $'+r.wage.toFixed(2)+' +'+(BURDEN*100)+'% burden</td><td>'+money(r.techLabor)+'</td></tr>'
+      +(r.supN?'<tr><td>Supervisor '+r.supHrs.toFixed(1)+' hrs @ $'+r.supWage.toFixed(2)+' +'+(BURDEN*100)+'% burden</td><td>'+money(r.supCost)+'</td></tr>':'')
       +'<tr><td>Incidentals ('+(INCIDENTALS*100)+'% of labor)</td><td>'+money(r.incCost)+'</td></tr>'
       +r.c.matLines.map(m=>'<tr><td>'+m.label+'</td><td>'+money(m.cost)+'</td></tr>').join('')
       +(r.c.extraLines||[]).map(m=>'<tr><td>'+m.label+'</td><td>'+money(m.cost)+'</td></tr>').join('')
@@ -858,6 +874,7 @@ function applySnapshot(p){
 }
 let saveTimer=null;
 function autosaveSoon(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>localSave(false),1200);}
+function resetAll(){clearTimeout(saveTimer);localStorage.removeItem('cwpx_current');location.reload();}
 function localSave(announce){
   localStorage.setItem('cwpx_current',JSON.stringify({ts:Date.now(),payload:snapshot()}));
   if(announce)alert('Saved locally.');
