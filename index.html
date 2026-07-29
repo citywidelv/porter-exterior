@@ -1,1405 +1,916 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>City Wide Exterior Porter Services Pricing Calculator</title>
-    <style>
-        :root {
-            --primary-blue: #a81e26;
-            --secondary-blue: #d22730;
-            --accent-red: #d22730;
-            --dark-gray: #2d2a26;
-            --light-gray: #f5f5f5;
-            --success-green: #0aa6a9;
-            --white: #FFFFFF;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Verdana, 'Liberation Sans', 'DejaVu Sans', Geneva, Tahoma, sans-serif;
-            background-color: var(--light-gray);
-            color: var(--dark-gray);
-            line-height: 1.6;
-        }
-
-        .header {
-            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-            color: white;
-            padding: 2rem 1rem;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-        }
-
-        .card h3 {
-            color: var(--primary-blue);
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--light-gray);
-        }
-
-        .cost-provider-section {
-            grid-column: 1 / -1;
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-        }
-
-        .toggle-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .toggle-group {
-            text-align: center;
-        }
-
-        .toggle-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--dark-gray);
-        }
-
-        .toggle-buttons {
-            display: flex;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 2px solid var(--light-gray);
-        }
-
-        .toggle-buttons button {
-            flex: 1;
-            padding: 0.75rem 1rem;
-            border: none;
-            background: white;
-            color: var(--dark-gray);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .vendor-btn.active {
-            background: var(--accent-red);
-            color: white;
-        }
-
-        .inhouse-btn.active {
-            background: var(--success-green);
-            color: white;
-        }
-
-        .toggle-buttons button:hover {
-            opacity: 0.8;
-        }
-
-        .input-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .input-group label {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--dark-gray);
-        }
-
-        .input-group input,
-        .input-group select {
-            padding: 0.75rem;
-            border: 2px solid var(--light-gray);
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .input-group input:focus,
-        .input-group select:focus {
-            outline: none;
-            border-color: var(--secondary-blue);
-        }
-
-        .results-grid {
-            grid-column: 1 / -1;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .result-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .result-card h4 {
-            color: var(--primary-blue);
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .result-card .value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--dark-gray);
-        }
-
-        .result-card.highlight {
-            background: var(--accent-red);
-            color: white;
-        }
-
-        .result-card.highlight h4 {
-            color: white;
-        }
-
-        .result-card.highlight .value {
-            color: white;
-        }
-
-        .ic-breakdown {
-            background: #f5f5f5;
-            border: 2px solid var(--secondary-blue);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin: 1rem 0;
-        }
-
-        .ic-breakdown h4 {
-            color: var(--primary-blue);
-            margin-bottom: 1rem;
-        }
-
-        .breakdown-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-        }
-
-        .breakdown-row.total {
-            border-top: 2px solid var(--secondary-blue);
-            padding-top: 0.5rem;
-            font-weight: 700;
-        }
-
-        .scope-section {
-            border: 2px solid var(--secondary-blue);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            background: #f5f5f5;
-        }
-
-        .scope-section h4 {
-            color: var(--primary-blue);
-            margin-bottom: 1rem;
-        }
-
-        .scope-areas {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .scope-area {
-            display: flex;
-            align-items: center;
-            padding: 0.5rem;
-            background: white;
-            border-radius: 6px;
-            border: 1px solid var(--light-gray);
-        }
-
-        .scope-area input[type="checkbox"] {
-            margin-right: 0.5rem;
-            transform: scale(1.2);
-        }
-
-        .export-section {
-            grid-column: 1 / -1;
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 2rem;
-        }
-
-        .export-btn {
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: white;
-        }
-
-        .export-btn.vendor {
-            background: var(--accent-red);
-        }
-
-        .export-btn.client {
-            background: var(--secondary-blue);
-        }
-
-        .export-btn.fsm {
-            background: var(--success-green);
-        }
-
-        .export-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .breakdown-grid {
-            grid-column: 1 / -1;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .warning-box {
-            background: #fbf2d3;
-            border: 2px solid #e5b423;
-            border-radius: 8px;
-            padding: 1rem;
-            margin: 1rem 0;
-        }
-
-        .warning-box h5 {
-            color: #7a6013;
-            margin-bottom: 0.5rem;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-                padding: 0 0.5rem;
-            }
-
-            .input-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .scope-areas {
-                grid-template-columns: 1fr;
-            }
-
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .results-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .export-section {
-                flex-direction: column;
-                align-items: center;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>City Wide Exterior Porter Calculator</title>
+<style>
+:root{
+  --cw-red:#D22730; --cw-red-dark:#a81e26; --cw-black:#2D2A26; --cw-grey:#636466;
+  --cw-white:#FFFFFF; --cw-teal:#0AA6A9; --cw-gold:#E5B423; --cw-light:#F5F5F5; --cw-border:#E5E5E5;
+  --sp-xs:4px; --sp-sm:8px; --sp-md:16px; --sp-lg:24px; --sp-xl:32px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:Verdana,'Liberation Sans','DejaVu Sans',Geneva,Tahoma,sans-serif;
+  background:linear-gradient(135deg,#ffffff 0%,#f0f0f0 100%);
+  min-height:100vh;color:var(--cw-black);padding:16px;font-size:14px;
+}
+.container{max-width:1500px;margin:0 auto;background:#fff;border-radius:15px;box-shadow:0 20px 40px rgba(0,0,0,.12);overflow:hidden}
+.logobar{background:#fff;padding:16px 30px 12px;text-align:center;border-bottom:1px solid var(--cw-border)}
+.logobar img{height:38px;width:auto;display:inline-block}
+.header{background:linear-gradient(135deg,var(--cw-red-dark) 0%,var(--cw-red) 100%);color:#fff;padding:20px 30px 18px;position:relative}
+.header h1{font-size:2em;font-weight:700;text-align:center;letter-spacing:.02em}
+.header p{text-align:center;font-size:13px;margin-top:6px;color:#fbe9ea}
+.header .hdr-actions{position:absolute;top:16px;right:20px;display:flex;gap:8px}
+.header .hdr-btn{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:16px;padding:6px 14px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit}
+.header .hdr-btn:hover{background:rgba(255,255,255,.28)}
+.tabs{display:flex;background:var(--cw-black);flex-wrap:wrap}
+.tab{flex:1;min-width:130px;padding:14px 10px;text-align:center;color:#cfcecd;cursor:pointer;font-weight:700;font-size:13px;border-bottom:4px solid transparent;user-select:none}
+.tab:hover{color:#fff}
+.tab.active{color:#fff;border-bottom-color:var(--cw-red);background:#3a3733}
+.controlbar{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;padding:14px 24px;background:#fafafa;border-bottom:1px solid var(--cw-border)}
+.controlbar .cfield label{display:block;font-size:10px;font-weight:700;color:var(--cw-grey);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.controlbar select,.controlbar input{padding:8px 10px;border:2px solid var(--cw-border);border-radius:6px;font-size:13px;font-family:inherit;background:#fff}
+.controlbar select:focus,.controlbar input:focus{outline:none;border-color:var(--cw-red)}
+.marginpill{font-size:12px;padding:6px 12px;border-radius:12px;font-weight:700;background:#e8f4fb;color:#1565a5}
+.marginpill.hot{background:#fde9ea;color:var(--cw-red-dark)}
+.tricnote{font-size:10px;color:var(--cw-grey);max-width:230px;line-height:1.35}
+.main{display:grid;grid-template-columns:1fr 360px;gap:24px;padding:24px}
+@media(max-width:1000px){.main{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--cw-border);border-radius:12px;padding:20px;margin-bottom:20px}
+.card h2{font-size:1.15em;font-weight:700;border-bottom:2px solid var(--cw-red);padding-bottom:8px;margin-bottom:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:700px){.grid3,.grid2{grid-template-columns:1fr}}
+.field label{display:block;font-size:11px;font-weight:700;color:var(--cw-grey);margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;padding:9px 10px;border:2px solid var(--cw-border);border-radius:6px;font-size:14px;font-family:inherit;background:#fff}
+.field input:focus,.field select:focus{outline:none;border-color:var(--cw-red)}
+.field small{display:block;color:var(--cw-grey);font-size:10.5px;margin-top:3px;line-height:1.4}
+.srctag{display:inline-block;font-size:8.5px;font-weight:700;padding:1px 6px;border-radius:8px;margin-left:5px;letter-spacing:.04em;vertical-align:1px}
+.src-walk{background:#e0f5f5;color:#067a7d}
+.src-map{background:#fdf1d7;color:#9a7208}
+.src-ask{background:#ececec;color:#636466}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:10.5px;color:var(--cw-grey);margin-bottom:12px;line-height:1.5}
+.legend span b{font-weight:700}
+.svc-card{border:1px solid var(--cw-border);border-radius:10px;margin-bottom:14px;overflow:hidden;background:#fff}
+.svc-head{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;background:#fafafa;user-select:none}
+.svc-head:hover{background:#f3f3f3}
+.svc-ico{width:34px;height:34px;background:#fff;border-radius:50%;border:1px solid var(--cw-border);padding:5px;flex-shrink:0}
+.svc-ico svg{width:100%;height:100%;stroke:var(--cw-grey);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.svc-head .t{flex:1}
+.svc-head .t b{font-size:14px;display:block}
+.svc-head .t span{font-size:11px;color:var(--cw-grey)}
+.svc-price{font-weight:700;color:var(--cw-red);font-size:14px;white-space:nowrap;text-align:right}
+.svc-price small{display:block;font-size:9.5px;color:var(--cw-grey);font-weight:400}
+.svc-toggle{width:44px;height:24px;border-radius:12px;background:#d5d5d5;position:relative;flex-shrink:0;transition:background .2s}
+.svc-toggle::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.svc-card.on .svc-toggle{background:var(--cw-teal)}
+.svc-card.on .svc-toggle::after{left:23px}
+.svc-body{display:none;padding:16px;border-top:1px solid var(--cw-border)}
+.svc-card.on .svc-body{display:block}
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:12px}
+.buildup{background:var(--cw-light);border-radius:8px;padding:12px;font-size:12px;margin-top:10px}
+.buildup .bl{display:flex;justify-content:space-between;padding:2.5px 0;color:#3d3a36}
+.buildup .bl b{font-weight:700}
+.buildup .bl.tot{border-top:1px solid #d9d9d9;margin-top:5px;padding-top:7px;font-weight:700}
+.buildup .bl.mkt{color:var(--cw-grey);font-size:11px}
+.mktflag{font-weight:700}
+.mktflag.ok{color:#1b7a43}
+.mktflag.warn{color:#b26a10}
+.howto{margin-top:12px;border:1px dashed var(--cw-border);border-radius:8px}
+.howto summary{padding:10px 12px;font-size:12px;font-weight:700;color:var(--cw-teal);cursor:pointer;user-select:none}
+.howto .hbody{padding:0 14px 14px;font-size:12px;line-height:1.6;color:#3d3a36}
+.howto .hbody h4{font-size:11.5px;margin:10px 0 4px;color:var(--cw-black)}
+.howto .hbody ol,.howto .hbody ul{margin-left:18px}
+.howto .hbody li{margin-bottom:3px}
+.warnbox{background:#fdf1e2;border-left:4px solid var(--cw-gold);padding:8px 12px;border-radius:0 6px 6px 0;font-size:11.5px;margin-top:8px;line-height:1.5}
+.summarywrap{position:sticky;top:16px;align-self:start}
+.summary{background:var(--cw-black);color:#fff;border-radius:12px;padding:20px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.summary h3{font-size:1.05em;border-bottom:2px solid var(--cw-red);padding-bottom:8px;margin-bottom:12px;letter-spacing:.02em}
+.sline{display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:4px 0;color:#e8e7e6}
+.sline .n{flex:1}
+.sline.cat{font-weight:700;color:#fff;border-top:1px solid #4a4742;margin-top:6px;padding-top:8px}
+.sline.sub{padding-left:12px;color:#bdbbb8;font-size:11.5px}
+.stotal{display:flex;justify-content:space-between;font-size:1.35em;font-weight:700;border-top:2px solid var(--cw-red);margin-top:12px;padding-top:12px}
+.stotal small{font-size:10px;color:#bdbbb8;font-weight:400;display:block;text-align:right}
+.smeta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
+.smeta .box{background:#3a3733;border-radius:8px;padding:8px;text-align:center}
+.smeta .box b{display:block;font-size:15px;color:#fff}
+.smeta .box span{font-size:9.5px;color:#bdbbb8;text-transform:uppercase;letter-spacing:.04em}
+.sbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.btn{flex:1;min-width:100px;padding:11px 10px;border:none;border-radius:8px;font-family:inherit;font-weight:700;font-size:12.5px;cursor:pointer;text-align:center}
+.btn-red{background:var(--cw-red);color:#fff}
+.btn-red:hover{background:var(--cw-red-dark)}
+.btn-ghost{background:transparent;color:#fff;border:2px solid #5a5751}
+.btn-ghost:hover{border-color:#fff}
+.btn-teal{background:var(--cw-teal);color:#fff}
+.btn-grey{background:var(--cw-light);color:var(--cw-black);border:1px solid var(--cw-border)}
+.btn-grey:hover{background:#ebebeb}
+.minrow{display:flex;align-items:center;gap:10px;margin-top:10px;background:#3a3733;border-radius:8px;padding:8px 10px;font-size:11px;color:#e8e7e6}
+.minrow input{margin-right:4px}
+.internal-toggle{font-size:11px;color:#bdbbb8;margin-top:12px;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.footer{background:var(--cw-black);color:#fff;text-align:center;padding:14px;font-size:11.5px}
+.footer b{font-weight:700}
+.footer a{color:#fff}
+.edu{padding:24px;max-width:1100px;margin:0 auto}
+.edu h2{font-size:1.3em;font-weight:700;border-bottom:2px solid var(--cw-red);padding-bottom:8px;margin:18px 0 12px}
+.edu h3{font-size:1.05em;font-weight:700;margin:16px 0 8px}
+.edu p,.edu li{font-size:13px;line-height:1.65;color:#3d3a36}
+.edu ul,.edu ol{margin:6px 0 12px 22px}
+.edu table{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0 18px}
+.edu th{background:var(--cw-black);color:#fff;padding:8px 10px;text-align:left;font-weight:700}
+.edu td{padding:7px 10px;border-bottom:1px solid var(--cw-border);vertical-align:top;line-height:1.5}
+.edu tr:nth-child(even) td{background:#fafafa}
+.edu .tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-right:4px}
+.tag-yes{background:#e7f6ee;color:#1b7a43}
+.tag-no{background:#fde9ea;color:var(--cw-red-dark)}
+.tag-care{background:#fdf1e2;color:#b26a10}
+.ratebook input{width:90px;padding:5px 7px;border:1.5px solid var(--cw-border);border-radius:5px;font-size:12px;font-family:inherit;text-align:right}
+.savemodal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:60;align-items:center;justify-content:center}
+.savemodal.open{display:flex}
+.savebox{background:#fff;border-radius:12px;max-width:560px;width:92%;max-height:80vh;overflow:auto;padding:22px}
+.savebox h3{border-bottom:2px solid var(--cw-red);padding-bottom:8px;margin-bottom:12px;font-size:1.05em}
+.saverow{display:flex;align-items:center;gap:10px;padding:9px 6px;border-bottom:1px solid var(--cw-border);font-size:12.5px}
+.saverow .meta{flex:1}
+.saverow .meta b{display:block}
+.saverow .meta span{color:var(--cw-grey);font-size:11px}
+.saverow button{padding:6px 10px;border-radius:6px;border:1px solid var(--cw-border);background:#fff;font-family:inherit;font-size:11.5px;font-weight:700;cursor:pointer}
+.saverow button:hover{background:var(--cw-light)}
+.saverow button.del{color:var(--cw-red)}
+#printArea{display:none}
+@media print{
+  body *{visibility:hidden}
+  body{background:#fff;padding:0}
+  #printArea,#printArea *{visibility:visible}
+  #printArea{display:block;position:absolute;top:0;left:0;width:100%;padding:32px;font-size:12px}
+}
+.p-head{display:flex;justify-content:space-between;align-items:center;border-bottom:4px solid var(--cw-red);padding-bottom:14px;margin-bottom:18px}
+.p-head img{height:34px}
+.p-head .pt{text-align:right}
+.p-head .pt b{font-size:18px;display:block}
+.p-head .pt span{color:var(--cw-grey);font-size:11px}
+.p-svc{margin-bottom:14px;border:1px solid var(--cw-border);border-radius:8px;padding:12px 14px;page-break-inside:avoid}
+.p-svc h4{font-size:13px;margin-bottom:4px}
+.p-svc p{font-size:11px;color:#3d3a36;line-height:1.55}
+.p-svc .p-price{float:right;font-weight:700;font-size:14px;color:var(--cw-red)}
+.p-total{display:flex;justify-content:space-between;font-size:16px;font-weight:700;border-top:3px solid var(--cw-red);margin-top:14px;padding-top:10px}
+.p-note{font-size:10px;color:var(--cw-grey);margin-top:16px;line-height:1.5}
+.p-table{width:100%;border-collapse:collapse;font-size:10.5px;margin-top:8px}
+.p-table th{background:var(--cw-light);text-align:left;padding:5px 7px;border:1px solid var(--cw-border)}
+.p-table td{padding:5px 7px;border:1px solid var(--cw-border)}
+.p-cat{font-size:13px;font-weight:700;border-bottom:2px solid var(--cw-black);padding-bottom:4px;margin:16px 0 8px}
+</style>
 </head>
 <body>
-<div style="background:#FFFFFF;border-bottom:3px solid #D22730;padding:10px 20px;"><img src="https://emailer.emfluence.com/clients/citywide/uploadedfiles/signature_logo.png" alt="City Wide Facility Solutions" style="height:42px;display:block;max-width:90%;object-fit:contain;object-position:left;"></div>
+<div class="container">
+  <div class="logobar" style="position:relative"><a href="https://citywidelv.github.io/cw-ops-desk/" style="position:absolute;left:18px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:700;color:#fff;background:var(--cw-red);text-decoration:none;border-radius:16px;padding:7px 15px;box-shadow:0 2px 6px rgba(210,39,48,.3)">&#8592; Back to Ops Hub</a><img src="https://emailer.emfluence.com/clients/citywide/uploadedfiles/signature_logo.png" alt="City Wide Facility Solutions"></div>
+  <div class="header">
+    <h1>Exterior Porter Calculator</h1>
+    <p>Litter Routes to Dedicated Coverage: Exterior Porter Pricing for Las Vegas &amp; Northern Nevada</p>
+    <div class="hdr-actions">
+      <button class="hdr-btn" id="userBtn" onclick="changeUser()">Set Your Name</button>
+      <button class="hdr-btn" onclick="openSaves()">Saved Work</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" data-tab="quote" onclick="showTab('quote')">Build a Quote</div>
+    <div class="tab" data-tab="land" onclick="showTab('land')">Coverage vs. Routes</div>
+    <div class="tab" data-tab="process" onclick="showTab('process')">FSM Playbook</div>
+    <div class="tab" data-tab="rates" onclick="showTab('rates')">Rates &amp; Wage Book</div>
+  </div>
 
-    <div class="header">
-        <h1>Exterior Porter Services</h1>
-        <p>Professional Pricing Calculator for Property Managers - Nevada</p>
+  <div id="tab-quote">
+    <div class="controlbar">
+      <div class="cfield"><label>Region</label>
+        <select id="region" onchange="recalc()">
+          <option value="lv">Las Vegas</option>
+          <option value="reno">Reno / Sparks</option>
+          <option value="carson">Carson City</option>
+          <option value="tric">TRIC / USA Parkway</option>
+        </select>
+      </div>
+      <div class="cfield"><label>Performed By</label><select id="laborBy" onchange="recalc()"><option value="vendor">Vendor Crew</option><option value="inhouse">City Wide In-House</option></select></div>
+      <div class="cfield"><label>Materials Provided By</label>
+        <select id="matProvider" onchange="recalc()">
+          <option value="vendor">Crew Provides (their cost + 15%)</option>
+          <option value="cw">City Wide (at our cost)</option>
+        </select>
+      </div>
+      <div class="cfield"><label>Override Margin % (blank = auto by job size)</label>
+        <input type="number" id="ovMargin" placeholder="auto 32-40" style="width:110px" oninput="recalc()">
+      </div>
+      <div class="cfield"><label>Active Margin</label><div class="marginpill" id="marginPill">auto</div></div>
+      <div class="tricnote" id="regionNote"></div>
     </div>
 
-    <div class="container">
-        <!-- Cost Provider Toggle System -->
-        <div class="cost-provider-section">
-            <h3>Cost Provider Selection</h3>
-            <div class="toggle-grid">
-                <div class="toggle-group">
-                    <label>Labor</label>
-                    <div class="toggle-buttons">
-                        <button class="vendor-btn active" onclick="toggleProvider('labor', 'vendor', this)">Vendor (+10% IC)</button>
-                        <button class="inhouse-btn" onclick="toggleProvider('labor', 'inhouse', this)">In-House (No IC)</button>
-                    </div>
-                </div>
-                <div class="toggle-group">
-                    <label>Equipment</label>
-                    <div class="toggle-buttons">
-                        <button class="vendor-btn active" onclick="toggleProvider('equipment', 'vendor', this)">Vendor (+10% IC)</button>
-                        <button class="inhouse-btn" onclick="toggleProvider('equipment', 'inhouse', this)">In-House (No IC)</button>
-                    </div>
-                </div>
-                <div class="toggle-group">
-                    <label>Materials</label>
-                    <div class="toggle-buttons">
-                        <button class="vendor-btn active" onclick="toggleProvider('materials', 'vendor', this)">Vendor (+10% IC)</button>
-                        <button class="inhouse-btn" onclick="toggleProvider('materials', 'inhouse', this)">In-House (No IC)</button>
-                    </div>
-                </div>
-                <div class="toggle-group">
-                    <label>Supplies</label>
-                    <div class="toggle-buttons">
-                        <button class="vendor-btn active" onclick="toggleProvider('supplies', 'vendor', this)">Vendor (+10% IC)</button>
-                        <button class="inhouse-btn" onclick="toggleProvider('supplies', 'inhouse', this)">In-House (No IC)</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Property Details -->
+    <div class="main">
+      <div>
         <div class="card">
-            <h3>Property Specifications</h3>
-            <div class="input-grid">
-                <div class="input-group">
-                    <label for="totalAcres">Total Property Size (Acres)</label>
-                    <input type="number" id="totalAcres" value="1.15" step="0.05" onchange="updateCalculations()">
-                </div>
-                <div class="input-group">
-                    <label for="buildingSqFt">Building Square Footage</label>
-                    <input type="number" id="buildingSqFt" value="25000" step="1000" onchange="updateCalculations()">
-                </div>
-                <div class="input-group">
-                    <label for="parkingSpaces">Number of Parking Spaces</label>
-                    <input type="number" id="parkingSpaces" value="200" onchange="updateCalculations()">
-                </div>
-                <div class="input-group">
-                    <label for="exteriorSqFt">Exterior Area to Maintain (Sq Ft)</label>
-                    <input type="number" id="exteriorSqFt" value="25000" step="1000" readonly>
-                    <small style="color: #666; font-size: 0.85rem;">Auto-calculated: Total acres minus building footprint</small>
-                </div>
-                <div class="input-group">
-                    <label for="propertyType">Property Type</label>
-                    <select id="propertyType" onchange="updateCalculations()">
-                        <option value="office">Office Building - Low debris</option>
-                        <option value="retail">Retail Center - Moderate debris</option>
-                        <option value="restaurant">Restaurant/Food Service - High debris</option>
-                        <option value="medical">Medical Facility - Standard debris</option>
-                        <option value="industrial">Industrial - Heavy debris</option>
-                        <option value="mixed">Mixed Use - Variable debris</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="condition">Current Property Condition</label>
-                    <select id="condition" onchange="updateCalculations()">
-                        <option value="excellent">Excellent - Well-maintained</option>
-                        <option value="good">Good - Regular maintenance</option>
-                        <option value="fair">Fair - Some neglect</option>
-                        <option value="poor">Poor - Significant neglect</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="frequencySchedule">Service Frequency</label>
-                    <select id="frequencySchedule" onchange="updateCalculations()">
-                        <option value="daily">Daily (7x/week)</option>
-                        <option value="weekdays">Weekdays Only (5x/week)</option>
-                        <option value="triweekly">3x/week (Mon/Wed/Fri)</option>
-                        <option value="biweekly">2x/week (Mon/Thu)</option>
-                        <option value="weekly">Weekly</option>
-                        <option value="bimonthly">Bi-monthly</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="accessComplexity">Access Complexity</label>
-                    <select id="accessComplexity" onchange="updateCalculations()">
-                        <option value="simple">Simple - Open lot</option>
-                        <option value="moderate">Moderate - Some obstacles</option>
-                        <option value="complex">Complex - Many obstacles</option>
-                        <option value="very_complex">Very Complex - Multiple levels</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Porter Service Scope -->
-            <div class="scope-section">
-                <h4>Porter Service Scope - "Named Areas"</h4>
-                <div class="scope-areas">
-                    <div class="scope-area">
-                        <input type="checkbox" id="exteriorBuildings" checked onchange="updateCalculations()">
-                        <label for="exteriorBuildings">Exterior of Buildings</label>
-                    </div>
-                    <div class="scope-area">
-                        <input type="checkbox" id="landscapingAreas" checked onchange="updateCalculations()">
-                        <label for="landscapingAreas">Landscaping Areas</label>
-                    </div>
-                    <div class="scope-area">
-                        <input type="checkbox" id="parkingLots" checked onchange="updateCalculations()">
-                        <label for="parkingLots">Parking Lots</label>
-                    </div>
-                    <div class="scope-area">
-                        <input type="checkbox" id="trashEnclosures" checked onchange="updateCalculations()">
-                        <label for="trashEnclosures">Trash Enclosures</label>
-                    </div>
-                </div>
-                <p><strong>Scope:</strong> Contractor will use whatever means necessary to ensure all debris is removed from "Named Areas". All debris removed will be disposed of off the property.</p>
-                
-                <div class="warning-box">
-                    <h5>Contractor Responsibilities:</h5>
-                    <p>• Inform Property Management of any additional items noted during service</p>
-                    <p>• Provide estimates for additional services when applicable</p>
-                    <p>• All scope modifications must be in writing and signed by both parties</p>
-                </div>
-            </div>
+          <h2>Job Info</h2>
+          <div class="grid3">
+            <div class="field"><label>Account / Property</label><input id="acct" placeholder="e.g. Summit Ridge Office Park" oninput="autosaveSoon()"></div>
+            <div class="field"><label>Quote Date</label><input type="date" id="qdate"></div>
+            <div class="field"><label>Prepared By</label><input id="prepBy" placeholder="Your name"></div>
+          </div>
         </div>
-
-        <!-- Labor & Market -->
         <div class="card">
-            <h3>Nevada Market & Labor Rates</h3>
-
-            <!-- Nevada Regional Selection -->
-            <div class="input-grid">
-                <div class="input-group">
-                    <label for="nevadaRegion">Nevada Region</label>
-                    <select id="nevadaRegion" onchange="updateNevadaRates()">
-                        <option value="southern">Southern Nevada (Las Vegas/Henderson)</option>
-                        <option value="northern">Northern Nevada (Reno/Carson City)</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="locationAccessibility">Location Accessibility</label>
-                    <select id="locationAccessibility" onchange="updateCalculations()">
-                        <option value="metro">Within Metro Area</option>
-                        <option value="commute">Commute Required (15-30 min) +10%</option>
-                        <option value="remote">Remote Location (30+ min) +20%</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- IC Rate Breakdown -->
-            <div class="ic-breakdown">
-                <h4>Independent Contractor Rate Breakdown (Always Visible)</h4>
-                <div class="input-grid">
-                    <div class="input-group">
-                        <label for="rawLaborRate">Raw Labor Rate ($/hour)</label>
-                        <input type="number" id="rawLaborRate" value="18.00" step="0.25" onchange="updateICRateBreakdown()">
-                    </div>
-                    <div class="input-group">
-                        <label for="stateTaxRate">State Income Tax (%)</label>
-                        <input type="number" id="stateTaxRate" value="0.00" step="0.1" onchange="updateICRateBreakdown()">
-                    </div>
-                    <div class="input-group">
-                        <label for="icProfitRate">IC Profit & OH (%)</label>
-                        <input type="number" id="icProfitRate" value="10.0" step="0.5" onchange="updateICRateBreakdown()">
-                    </div>
-                    <div class="input-group">
-                        <label for="cityWideMargin">City Wide Margin (%)</label>
-                        <input type="number" id="cityWideMargin" value="32.0" step="0.5" onchange="updateCalculations()">
-                    </div>
-                </div>
-
-                <div id="icBreakdownDisplay">
-                    <!-- Breakdown details will be populated by JavaScript -->
-                </div>
-            </div>
-
-            <div class="input-grid">
-                <div class="input-group">
-                    <label for="crewSize">Crew Size</label>
-                    <select id="crewSize" onchange="updateCalculations()">
-                        <option value="1">1 Person</option>
-                        <option value="2" selected>2 Person Team</option>
-                        <option value="3">3 Person Team</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="timeOfService">Time of Service</label>
-                    <select id="timeOfService" onchange="updateCalculations()">
-                        <option value="normal">Normal Hours (6AM-6PM)</option>
-                        <option value="evening">Evening Hours (6PM-10PM) +15%</option>
-                        <option value="overnight">Overnight (10PM-6AM) +25%</option>
-                    </select>
-                </div>
-            </div>
+          <h2>Exterior Porter Services</h2>
+          <div class="legend"><span><b class="srctag src-walk" style="margin-left:0">WALK</b> count it on the property visit</span><span><b class="srctag src-map" style="margin-left:0">MAP</b> measure it from your desk on Google Earth</span><span><b class="srctag src-ask" style="margin-left:0">ASK</b> get it from the property manager or as-builts</span></div>
+          <p style="font-size:11.5px;color:var(--cw-grey);margin-bottom:12px">Pick the service model first: a route visit program, a dedicated on-site porter, or both. The tool builds price the same way the Bid Calculator does: crew labor plus payroll burden, supplies, equipment and vehicle time, an incidentals cushion, the crew company margin, then City Wide margin on top. Every number is prepopulated and every number can be typed over. Recurring services roll into one monthly contract price. Extras price separately and bill when performed.</p>
+          <div id="svcList"></div>
         </div>
-
-        <!-- Equipment & Materials -->
-        <div class="card">
-            <h3>Equipment & Materials</h3>
-            <div class="input-grid">
-                <div class="input-group">
-                    <label for="sweepingEquipmentRate">Sweeping Equipment ($/hour)</label>
-                    <input type="number" id="sweepingEquipmentRate" value="45.00" step="1.00" onchange="updateCalculations()">
-                </div>
-                <div class="input-group">
-                    <label for="supportEquipmentRate">Support Equipment ($/hour)</label>
-                    <input type="number" id="supportEquipmentRate" value="15.00" step="1.00" onchange="updateCalculations()">
-                </div>
-                <div class="input-group">
-                    <label for="fuelCostPerService">Fuel Cost Per Service ($)</label>
-                    <input type="number" id="fuelCostPerService" value="25.00" step="1.00" onchange="updateCalculations()">
-                </div>
-                <div class="input-group">
-                    <label for="disposalCostPerService">Disposal Cost Per Service ($)</label>
-                    <input type="number" id="disposalCostPerService" value="35.00" step="1.00" onchange="updateCalculations()">
-                </div>
-            </div>
+        <div class="card" id="shopCard" style="display:none">
+          <h2>Supplies, Vehicle &amp; Pass-Throughs for This Account</h2>
+          <p style="font-size:11.5px;color:var(--cw-grey);margin-bottom:10px">What this account consumes in a year, by item. Liners, ice melt product, vehicle allocations and pass-throughs for the year. Double-check big lines and update the Rate Book if a price moved.</p>
+          <div id="shopList"></div>
         </div>
-
-        <!-- Competitive Adjustments -->
-        <div class="card">
-            <h3>Market Competitive Adjustment</h3>
-            <div class="input-grid">
-                <div class="input-group">
-                    <label for="clientType">Client Type</label>
-                    <select id="clientType" onchange="updateCalculations()">
-                        <option value="owner">Building Owner (Direct) - Standard pricing</option>
-                        <option value="pm" selected>Property Management Company - No markup</option>
-                        <option value="tenant">Tenant/Occupant - 2% discount</option>
-                        <option value="gc">General Contractor - 5% volume discount</option>
-                        <option value="recurring">Recurring Contract - 15% loyalty discount</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="competitiveAdjustment">Competitive Bid Adjustment (%)</label>
-                    <input type="number" id="competitiveAdjustment" value="0" step="0.5" min="-10" max="10" onchange="updateCalculations()">
-                </div>
-            </div>
+      </div>
+      <div class="summarywrap">
+        <div class="summary">
+          <h3>Quote Summary</h3>
+          <div id="sumLines"><div style="font-size:12px;color:#bdbbb8">Turn on services to build the quote.</div></div>
+          <div class="stotal"><span>Monthly Contract</span><span id="sumTotal">$0</span></div>
+          <div id="enhTotal" style="display:none;font-size:12px;color:#e8e7e6;text-align:right;margin-top:4px"></div>
+          <div class="smeta">
+            <div class="box"><b id="mPerAcre">$0</b><span>Eff $ / Site Hr</span></div>
+            <div class="box"><b id="mHours">0</b><span>Annual Crew Hrs</span></div>
+            <div class="box"><b id="mSvcs">0</b><span>Services</span></div>
+          </div>
+          <div class="minrow" id="minRow" style="display:none">
+            <div style="flex:1" id="minMsg"></div>
+          </div>
+          <div class="minrow">
+            <label style="cursor:pointer"><input type="checkbox" id="minOverride" onchange="recalc()"> Override $250/mo minimum</label>
+            <input id="minReason" placeholder="Reason (bundled account, GM approval...)" style="flex:1;padding:6px 8px;border:none;border-radius:5px;font-family:inherit;font-size:11px" oninput="recalc()">
+          </div>
+          <label class="internal-toggle"><input type="checkbox" id="showInternal" onchange="recalc()"> Show cost &amp; margin (internal)</label>
+          <div class="sbtns">
+            <button class="btn btn-red" onclick="printQuote(false)">Print Client Quote</button>
+            <button class="btn btn-ghost" onclick="printQuote(true)">Print Internal</button>
+            <button class="btn btn-teal" onclick="copyQuote()">Copy Quote Text</button>
+            <button class="btn btn-ghost" onclick="saveWork(true)">Save Work</button>
+          </div>
         </div>
-
-        <!-- Results Display -->
-        <div class="results-grid">
-            <div class="result-card">
-                <h4>Service Hours Per Visit</h4>
-                <div class="value" id="hoursPerVisit">0</div>
-            </div>
-            <div class="result-card">
-                <h4>Total Monthly Hours</h4>
-                <div class="value" id="totalMonthlyHours">0</div>
-            </div>
-            <div class="result-card">
-                <h4>Labor Cost (Monthly)</h4>
-                <div class="value" id="laborCost">$0</div>
-            </div>
-            <div class="result-card">
-                <h4>Equipment Cost (Monthly)</h4>
-                <div class="value" id="equipmentCost">$0</div>
-            </div>
-            <div class="result-card">
-                <h4>Total Cost to City Wide</h4>
-                <div class="value" id="totalCostToFranchise">$0</div>
-            </div>
-            <div class="result-card">
-                <h4>Price Per Exterior Acre</h4>
-                <div class="value" id="pricePerAcre">$0</div>
-            </div>
-            <div class="result-card highlight">
-                <h4>Monthly Client Price</h4>
-                <div class="value" id="finalClientPrice">$0</div>
-            </div>
-            <div class="result-card highlight">
-                <h4>City Wide Gross Profit</h4>
-                <div class="value" id="grossProfit">$0</div>
-            </div>
-        </div>
-
-        <!-- Detailed Breakdown -->
-        <div class="breakdown-grid">
-            <div class="card">
-                <h3>Porter Production Analysis</h3>
-                <div id="productionBreakdown">
-                    <!-- Production breakdown will be populated by JavaScript -->
-                </div>
-            </div>
-
-            <div class="card">
-                <h3>Cost Structure</h3>
-                <div id="costBreakdown">
-                    <!-- Cost breakdown will be populated by JavaScript -->
-                </div>
-            </div>
-
-            <div class="card">
-                <h3>Pricing Analysis</h3>
-                <div id="pricingBreakdown">
-                    <!-- Pricing breakdown will be populated by JavaScript -->
-                </div>
-            </div>
-
-            <div class="card">
-                <h3>Market Comparison</h3>
-                <div id="marketComparison">
-                    <!-- Market comparison will be populated by JavaScript -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Export Options -->
-        <div class="export-section">
-            <button class="export-btn vendor" onclick="exportVendorSpecs()">Export Vendor Specifications</button>
-            <button class="export-btn client" onclick="exportClientInstructions()">Export Client Instructions</button>
-            <button class="export-btn fsm" onclick="exportFSMSummary()">Export FSM Job Summary</button>
-        </div>
+      </div>
     </div>
+  </div>
 
-    <script>
-        // Global state for provider selections
-        const providerState = {
-            labor: 'vendor',
-            equipment: 'vendor',
-            materials: 'vendor',
-            supplies: 'vendor'
-        };
+  <div id="tab-land" style="display:none"><div class="edu" id="landContent"></div></div>
+  <div id="tab-process" style="display:none"><div class="edu" id="processContent"></div></div>
+  <div id="tab-rates" style="display:none"><div class="edu ratebook" id="ratesContent"></div></div>
 
-        // Porter service production rates per acre (industry standards)
-        const porterProductionRates = {
-            // Hours per acre per service based on property condition and complexity
-            excellent: { simple: 1.5, moderate: 2.0, complex: 2.5, very_complex: 3.0 },
-            good: { simple: 2.0, moderate: 2.5, complex: 3.0, very_complex: 3.5 },
-            fair: { simple: 2.5, moderate: 3.0, complex: 3.5, very_complex: 4.0 },
-            poor: { simple: 3.0, moderate: 3.5, complex: 4.0, very_complex: 4.5 }
-        };
-
-        // Property type debris multipliers
-        const propertyDebrisMultipliers = {
-            office: 1.0,
-            retail: 1.2,
-            restaurant: 1.5,
-            medical: 1.1,
-            industrial: 1.3,
-            mixed: 1.25
-        };
-
-        // Frequency efficiency multipliers (more frequent = more efficient)
-        const frequencyEfficiencyMultipliers = {
-            daily: 0.85,        // Very efficient due to low debris accumulation
-            weekdays: 0.90,     // Efficient with regular schedule
-            triweekly: 1.0,     // Standard baseline
-            biweekly: 1.1,      // Slightly more time due to debris buildup
-            weekly: 1.2,        // More debris accumulated
-            bimonthly: 1.4      // Significant debris buildup
-        };
-
-        // Named area coverage multipliers
-        const namedAreaMultipliers = {
-            exteriorBuildings: 0.15,   // 15% of total time
-            landscapingAreas: 0.25,    // 25% of total time
-            parkingLots: 0.50,         // 50% of total time (primary area)
-            trashEnclosures: 0.10      // 10% of total time
-        };
-
-        function updateNevadaRates() {
-            const region = document.getElementById('nevadaRegion').value;
-            const rawLaborRateInput = document.getElementById('rawLaborRate');
-            
-            if (region === 'southern') {
-                // Las Vegas area - higher cost of living
-                rawLaborRateInput.value = '18.00';
-            } else {
-                // Reno area - slightly lower
-                rawLaborRateInput.value = '16.50';
-            }
-            
-            updateICRateBreakdown();
-        }
-
-        function toggleProvider(category, provider, button) {
-            // Update state
-            providerState[category] = provider;
-            
-            // Update UI
-            const buttonGroup = button.parentElement;
-            const buttons = buttonGroup.querySelectorAll('button');
-            
-            buttons.forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            button.classList.add('active');
-            
-            // Recalculate
-            updateCalculations();
-        }
-
-        function updateICRateBreakdown() {
-            const rawRate = parseFloat(document.getElementById('rawLaborRate').value) || 18.00;
-            const stateTax = parseFloat(document.getElementById('stateTaxRate').value) || 0.00;
-            const icProfitRate = parseFloat(document.getElementById('icProfitRate').value) || 10.0;
-            
-            // Fixed percentages based on City Wide standards
-            const fica = rawRate * 0.0765;          // 7.65%
-            const futa = rawRate * 0.0060;          // 0.60%
-            const workComp = rawRate * 0.0250;      // 2.50%
-            const gl = rawRate * 0.0050;            // 0.50%
-            const stateTaxAmount = rawRate * (stateTax / 100);
-            
-            const subTotal = rawRate + fica + futa + workComp + gl + stateTaxAmount;
-            const icProfitAmount = subTotal * (icProfitRate / 100);
-            const icLoadedRate = subTotal + icProfitAmount;
-            
-            const breakdownHtml = `
-                <div class="breakdown-row">
-                    <span>Raw Labor Rate:</span>
-                    <span>$${rawRate.toFixed(2)}/hr</span>
-                </div>
-                <div class="breakdown-row">
-                    <span>FICA (7.65%):</span>
-                    <span>$${fica.toFixed(2)}/hr</span>
-                </div>
-                <div class="breakdown-row">
-                    <span>FUTA (0.60%):</span>
-                    <span>$${futa.toFixed(2)}/hr</span>
-                </div>
-                <div class="breakdown-row">
-                    <span>Workers Comp (2.50%):</span>
-                    <span>$${workComp.toFixed(2)}/hr</span>
-                </div>
-                <div class="breakdown-row">
-                    <span>General Liability (0.50%):</span>
-                    <span>$${gl.toFixed(2)}/hr</span>
-                </div>
-                <div class="breakdown-row">
-                    <span>State Income Tax (${stateTax}%):</span>
-                    <span>$${stateTaxAmount.toFixed(2)}/hr</span>
-                </div>
-                <div class="breakdown-row">
-                    <span><strong>Loaded Rate:</strong></span>
-                    <span><strong>$${subTotal.toFixed(2)}/hr</strong></span>
-                </div>
-                <div class="breakdown-row">
-                    <span>IC Profit & OH (${icProfitRate}%):</span>
-                    <span>$${icProfitAmount.toFixed(2)}/hr</span>
-                </div>
-                <div class="breakdown-row total">
-                    <span>IC Loaded Rate:</span>
-                    <span>$${icLoadedRate.toFixed(2)}/hr</span>
-                </div>
-                <div style="margin-top: 1rem; padding: 0.5rem; background: #ececec; border-radius: 4px;">
-                    <strong>When VENDOR selected:</strong> Using IC Loaded Rate of $${icLoadedRate.toFixed(2)}/hr<br>
-                    <strong>When IN-HOUSE selected:</strong> Using Loaded Rate of $${subTotal.toFixed(2)}/hr (no IC profit)
-                </div>
-            `;
-            
-            document.getElementById('icBreakdownDisplay').innerHTML = breakdownHtml;
-            updateCalculations();
-        }
-
-        function updateCalculations() {
-            // Get all input values
-            const totalAcres = parseFloat(document.getElementById('totalAcres').value) || 1.15;
-            const buildingSqFt = parseFloat(document.getElementById('buildingSqFt').value) || 25000;
-            const condition = document.getElementById('condition').value;
-            const propertyType = document.getElementById('propertyType').value;
-            const frequency = document.getElementById('frequencySchedule').value;
-            const accessComplexity = document.getElementById('accessComplexity').value;
-            const accessibility = document.getElementById('locationAccessibility').value || 'metro';
-            const crewSize = parseInt(document.getElementById('crewSize').value) || 2;
-            const timeOfService = document.getElementById('timeOfService').value || 'normal';
-            const clientType = document.getElementById('clientType').value || 'pm';
-            const competitiveAdjustment = parseFloat(document.getElementById('competitiveAdjustment').value) || 0;
-
-            // Calculate exterior area to maintain
-            const totalSqFt = totalAcres * 43560; // Convert acres to sq ft
-            const exteriorSqFt = Math.max(totalSqFt - buildingSqFt, 0);
-            const exteriorAcres = exteriorSqFt / 43560; // Convert back to acres for calculations
-            
-            // Update the exterior area display
-            document.getElementById('exteriorSqFt').value = Math.round(exteriorSqFt);
-
-            // Calculate hours per service based on exterior area only
-            const baseHoursPerAcre = porterProductionRates[condition][accessComplexity] || 2.0;
-            const propertyMultiplier = propertyDebrisMultipliers[propertyType] || 1.0;
-            const frequencyMultiplier = frequencyEfficiencyMultipliers[frequency] || 1.0;
-            
-            // Calculate named area coverage
-            let namedAreaCoverage = 0;
-            const namedAreas = ['exteriorBuildings', 'landscapingAreas', 'parkingLots', 'trashEnclosures'];
-            namedAreas.forEach(area => {
-                if (document.getElementById(area).checked) {
-                    namedAreaCoverage += namedAreaMultipliers[area] || 0;
-                }
-            });
-            
-            // If no areas selected, default to all areas
-            if (namedAreaCoverage === 0) {
-                namedAreaCoverage = 1.0;
-            }
-
-            // Calculate hours per visit using exterior acres only
-            let hoursPerVisit = (baseHoursPerAcre * exteriorAcres * propertyMultiplier * frequencyMultiplier * namedAreaCoverage) / crewSize;
-            
-            // Apply time of service multiplier
-            if (timeOfService === 'evening') hoursPerVisit *= 1.15;
-            if (timeOfService === 'overnight') hoursPerVisit *= 1.25;
-            
-            // Apply accessibility multiplier
-            if (accessibility === 'commute') hoursPerVisit *= 1.10;
-            if (accessibility === 'remote') hoursPerVisit *= 1.20;
-
-            // Calculate monthly hours
-            const weeklyServices = getWeeklyServiceCount(frequency);
-            const totalMonthlyHours = hoursPerVisit * weeklyServices * 4.33; // 4.33 weeks per month
-
-            // Calculate costs
-            const laborCost = calculateLaborCost(totalMonthlyHours, crewSize);
-            const equipmentCost = calculateEquipmentCost(totalMonthlyHours, weeklyServices);
-            
-            const totalCostToFranchise = laborCost + equipmentCost;
-            
-            // Apply City Wide margin
-            const margin = parseFloat(document.getElementById('cityWideMargin').value) || 32.0;
-            let finalClientPrice = totalCostToFranchise / (1 - margin / 100);
-            
-            // Apply client type adjustments
-            finalClientPrice = applyClientTypeAdjustment(finalClientPrice, clientType);
-            
-            // Apply competitive adjustment
-            finalClientPrice = finalClientPrice * (1 + competitiveAdjustment / 100);
-            
-            const grossProfit = finalClientPrice - totalCostToFranchise;
-            const pricePerAcre = exteriorAcres > 0 ? finalClientPrice / exteriorAcres : 0;
-
-            // Update display
-            document.getElementById('hoursPerVisit').textContent = hoursPerVisit.toFixed(1);
-            document.getElementById('totalMonthlyHours').textContent = Math.round(totalMonthlyHours);
-            document.getElementById('laborCost').textContent = formatCurrency(laborCost);
-            document.getElementById('equipmentCost').textContent = formatCurrency(equipmentCost);
-            document.getElementById('totalCostToFranchise').textContent = formatCurrency(totalCostToFranchise);
-            document.getElementById('pricePerAcre').textContent = formatCurrency(pricePerAcre);
-            document.getElementById('finalClientPrice').textContent = formatCurrency(finalClientPrice);
-            document.getElementById('grossProfit').textContent = formatCurrency(grossProfit);
-
-            updateDetailedBreakdowns(hoursPerVisit, totalMonthlyHours, laborCost, equipmentCost, finalClientPrice, grossProfit, margin, exteriorAcres, totalAcres, buildingSqFt);
-        }
-
-        function getWeeklyServiceCount(frequency) {
-            const frequencies = {
-                daily: 7,
-                weekdays: 5,
-                triweekly: 3,
-                biweekly: 2,
-                weekly: 1,
-                bimonthly: 0.5
-            };
-            return frequencies[frequency] || 1;
-        }
-
-        function calculateLaborCost(totalHours, crewSize) {
-            const isVendor = providerState.labor === 'vendor';
-            
-            let laborRate;
-            if (isVendor) {
-                laborRate = getICLoadedRate();
-            } else {
-                laborRate = calculateInHouseLoadedRate();
-            }
-            
-            return laborRate * totalHours * crewSize;
-        }
-
-        function calculateEquipmentCost(totalHours, weeklyServices) {
-            const sweepingRate = parseFloat(document.getElementById('sweepingEquipmentRate').value) || 45.00;
-            const supportRate = parseFloat(document.getElementById('supportEquipmentRate').value) || 15.00;
-            const fuelCost = parseFloat(document.getElementById('fuelCostPerService').value) || 25.00;
-            const disposalCost = parseFloat(document.getElementById('disposalCostPerService').value) || 35.00;
-            
-            const isVendor = providerState.equipment === 'vendor';
-            
-            // Calculate equipment hourly cost
-            const equipmentHourlyCost = sweepingRate + supportRate;
-            let totalEquipmentCost = equipmentHourlyCost * totalHours;
-            
-            // Add per-service costs (fuel and disposal)
-            const monthlyServices = weeklyServices * 4.33;
-            const perServiceCosts = (fuelCost + disposalCost) * monthlyServices;
-            totalEquipmentCost += perServiceCosts;
-            
-            if (isVendor) {
-                totalEquipmentCost *= 1.10; // Add 10% IC profit
-            }
-            
-            return totalEquipmentCost;
-        }
-
-        function applyClientTypeAdjustment(price, clientType) {
-            const adjustments = {
-                owner: 1.0,       // Standard pricing
-                pm: 1.0,          // No markup for property managers
-                tenant: 0.98,     // 2% discount
-                gc: 0.95,         // 5% volume discount
-                recurring: 0.85   // 15% loyalty discount
-            };
-            return price * (adjustments[clientType] || 1.0);
-        }
-
-        function getICLoadedRate() {
-            const rawRate = parseFloat(document.getElementById('rawLaborRate').value) || 18.00;
-            const stateTax = parseFloat(document.getElementById('stateTaxRate').value) || 0.00;
-            const icProfitRate = parseFloat(document.getElementById('icProfitRate').value) || 10.0;
-            
-            const fica = rawRate * 0.0765;
-            const futa = rawRate * 0.0060;
-            const workComp = rawRate * 0.0250;
-            const gl = rawRate * 0.0050;
-            const stateTaxAmount = rawRate * (stateTax / 100);
-            
-            const subTotal = rawRate + fica + futa + workComp + gl + stateTaxAmount;
-            const icProfitAmount = subTotal * (icProfitRate / 100);
-            
-            return subTotal + icProfitAmount;
-        }
-
-        function calculateInHouseLoadedRate() {
-            const rawRate = parseFloat(document.getElementById('rawLaborRate').value) || 18.00;
-            const stateTax = parseFloat(document.getElementById('stateTaxRate').value) || 0.00;
-            
-            const fica = rawRate * 0.0765;
-            const futa = rawRate * 0.0060;
-            const workComp = rawRate * 0.0250;
-            const gl = rawRate * 0.0050;
-            const stateTaxAmount = rawRate * (stateTax / 100);
-            
-            return rawRate + fica + futa + workComp + gl + stateTaxAmount;
-        }
-
-        function updateDetailedBreakdowns(hoursPerVisit, totalMonthlyHours, laborCost, equipmentCost, finalPrice, grossProfit, margin, exteriorAcres, totalAcres, buildingSqFt) {
-            // Production Analysis
-            const condition = document.getElementById('condition').value;
-            const accessComplexity = document.getElementById('accessComplexity').value;
-            const baseRate = porterProductionRates[condition][accessComplexity] || 2.0;
-            
-            const productionBreakdownHtml = `
-                <div class="breakdown-row">
-                    <span>Total Property:</span>
-                    <span>${totalAcres} acres</span>
-                </div>
-                <div class="breakdown-row">
-                    <span>Building Footprint:</span>
-                    <span>${(buildingSqFt / 43560).toFixed(2)} acres</span>
-                </div>
-                <div class="breakdown-row">
-                    <span>Exterior Area to Maintain:</span>
-                    <span>${exteriorAcres.toFixed(2)} acres</span>
-                </div>
-                <div class="breakdown-row">
-                    <span>Base Rate (${condition}, ${accessComplexity}):</span>
-                    <span>${baseRate} hrs/acre</span>
-                </div>
-                <div class="breakdown-row">
-                    <span>Hours Per Visit:</span>
-                    <span>${hoursPerVisit.toFixed(1)} hours</span>
-                </div>
-                <div class="breakdown-row total">
-                    <span>Monthly Hours:</span>
-                    <span>${Math.round(totalMonthlyHours)} hours</span>
-                </div>
-            `;
-            
-            document.getElementById('productionBreakdown').innerHTML = productionBreakdownHtml;
-
-            // Cost Structure
-            const totalCost = laborCost + equipmentCost;
-            const costBreakdownHtml = `
-                <div class="breakdown-row">
-                    <span>Labor Cost:</span>
-                    <span>${formatCurrency(laborCost)}</span>
-                </div>
-                <div class="breakdown-row">
-                    <span>Equipment & Disposal Cost:</span>
-                    <span>${formatCurrency(equipmentCost)}</span>
-                </div>
-                <div class="breakdown-row total">
-                    <span>Total Cost to City Wide:</span>
-                    <span>${formatCurrency(totalCost)}</span>
-                </div>
-            `;
-            
-            document.getElementById('costBreakdown').innerHTML = costBreakdownHtml;
-
-            // Pricing Analysis
-            const pricingBreakdownHtml = `
-                <div class="breakdown-row">
-                    <span>Total Cost to City Wide:</span>
-                    <span>${formatCurrency(totalCost)}</span>
-                </div>
-                <div class="breakdown-row">
-                    <span>City Wide Margin (${margin}%):</span>
-                    <span>${formatCurrency(grossProfit)}</span>
-                </div>
-                <div class="breakdown-row total">
-                    <span>Final Client Price:</span>
-                    <span>${formatCurrency(finalPrice)}</span>
-                </div>
-                <div class="breakdown-row">
-                    <span>Gross Profit Margin:</span>
-                    <span>${((grossProfit / finalPrice) * 100).toFixed(1)}%</span>
-                </div>
-                <div class="breakdown-row">
-                    <span>Price Per Exterior Acre:</span>
-                    <span>${formatCurrency(finalPrice / exteriorAcres)}</span>
-                </div>
-            `;
-            
-            document.getElementById('pricingBreakdown').innerHTML = pricingBreakdownHtml;
-
-            // Market Comparison
-            const marketLowPerAcre = 150;
-            const marketHighPerAcre = 400;
-            const marketAvgPerAcre = 275;
-            
-            const marketLow = marketLowPerAcre * exteriorAcres;
-            const marketHigh = marketHighPerAcre * exteriorAcres;
-            const marketAvg = marketAvgPerAcre * exteriorAcres;
-            
-            const marketComparisonHtml = `
-                <div class="breakdown-row">
-                    <span>Market Range (Low):</span>
-                    <span>${formatCurrency(marketLow)}/month</span>
-                </div>
-                <div class="breakdown-row">
-                    <span>Market Average:</span>
-                    <span>${formatCurrency(marketAvg)}/month</span>
-                </div>
-                <div class="breakdown-row">
-                    <span>Market Range (High):</span>
-                    <span>${formatCurrency(marketHigh)}/month</span>
-                </div>
-                <div class="breakdown-row total">
-                    <span>Our Price Position:</span>
-                    <span>${finalPrice < marketAvg ? 'Below Market' : finalPrice > marketAvg ? 'Above Market' : 'At Market'}</span>
-                </div>
-                <div class="breakdown-row">
-                    <span>Exterior Acres Maintained:</span>
-                    <span>${exteriorAcres.toFixed(2)} acres</span>
-                </div>
-                <div class="breakdown-row">
-                    <span>Our Price Per Exterior Acre:</span>
-                    <span>${formatCurrency(finalPrice / exteriorAcres)}/acre</span>
-                </div>
-            `;
-            
-            document.getElementById('marketComparison').innerHTML = marketComparisonHtml;
-        }
-
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-            }).format(amount);
-        }
-
-        // Export Functions
-        function exportVendorSpecs() {
-            const content = generateVendorRTF();
-            downloadRTF(content, 'exterior-porter-vendor-specifications.rtf');
-        }
-
-        function exportClientInstructions() {
-            const content = generateClientRTF();
-            downloadRTF(content, 'exterior-porter-client-instructions.rtf');
-        }
-
-        function exportFSMSummary() {
-            const content = generateFSMRTF();
-            downloadRTF(content, 'fsm-exterior-porter-summary.rtf');
-        }
-
-        function generateVendorRTF() {
-            const totalAcres = document.getElementById('totalAcres').value;
-            const frequency = document.getElementById('frequencySchedule').value;
-            const hoursPerVisit = document.getElementById('hoursPerVisit').textContent;
-            const totalMonthlyHours = document.getElementById('totalMonthlyHours').textContent;
-            
-            return `{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Times New Roman;}}
-\\f0\\fs24
-EXTERIOR PORTER SERVICES - VENDOR SPECIFICATIONS\\par
-\\par
-PROPERTY DETAILS:\\par
-Total Property Size: ${totalAcres} acres\\par
-Service Frequency: ${frequency}\\par
-Hours Per Visit: ${hoursPerVisit}\\par
-Total Monthly Hours: ${totalMonthlyHours}\\par
-\\par
-SCOPE OF WORK - "NAMED AREAS":\\par
-\\par
-The Contractor shall maintain the following Named Areas:\\par
-1. EXTERIOR OF BUILDINGS\\par
-2. LANDSCAPING AREAS\\par
-3. PARKING LOTS\\par
-4. TRASH ENCLOSURES\\par
-\\par
-SERVICE REQUIREMENTS:\\par
-\\par
-• Contractor will use whatever means necessary to ensure all debris is removed from Named Areas\\par
-• All debris removed must be disposed of off the property\\par
-• Contractor must inform Property Management of any additional items noted during service\\par
-• Provide estimates for additional services when applicable\\par
-• All scope modifications must be in writing and signed by both parties\\par
-\\par
-EQUIPMENT REQUIREMENTS:\\par
-• Mechanical parking lot sweeper\\par
-• Backpack blowers for detail work\\par
-• Hand tools for spot cleaning\\par
-• Proper disposal containers and vehicles\\par
-• Safety equipment and high-visibility vests\\par
-\\par
-QUALITY STANDARDS:\\par
-• Complete coverage of all Named Areas during each service\\par
-• Thorough debris removal from all accessible areas\\par
-• Professional appearance and conduct at all times\\par
-• Detailed service logs and incident reporting\\par
-• Weather delay policies and makeup service procedures\\par
-\\par
-INSURANCE & LICENSING:\\par
-• General Liability: Minimum $1,000,000\\par
-• Commercial Auto: Minimum $1,000,000\\par
-• Workers Compensation: As required by Nevada state law\\par
-• Valid Nevada contractor license (if work exceeds $1,000)\\par
-}`;
-        }
-
-        function generateClientRTF() {
-            const frequency = document.getElementById('frequencySchedule').value;
-            const finalPrice = document.getElementById('finalClientPrice').textContent;
-            const totalAcres = document.getElementById('totalAcres').value;
-            const pricePerAcre = document.getElementById('pricePerAcre').textContent;
-            
-            return `{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Times New Roman;}}
-\\f0\\fs24
-EXTERIOR PORTER SERVICES - CLIENT AGREEMENT\\par
-\\par
-PROPERTY: ${totalAcres} Acres\\par
-SERVICE FREQUENCY: ${frequency}\\par
-MONTHLY INVESTMENT: ${finalPrice} (${pricePerAcre}/acre)\\par
-\\par
-SCOPE OF SERVICES:\\par
-\\par
-Your property will receive comprehensive exterior porter maintenance covering all "Named Areas":\\par
-\\par
-✓ EXTERIOR OF BUILDINGS - Debris removal around building perimeter\\par
-✓ LANDSCAPING AREAS - Cleanup of planted areas and landscape beds\\par
-✓ PARKING LOTS - Complete sweeping and debris removal\\par
-✓ TRASH ENCLOSURES - Cleaning and maintenance of waste areas\\par
-\\par
-SERVICE DELIVERY:\\par
-\\par
-• Professional crews will service your property ${frequency}\\par
-• All debris will be removed and disposed of off-site\\par
-• Weather delays will be made up as soon as conditions permit\\par
-• Emergency cleanup available upon request\\par
-• Detailed service reports provided monthly\\par
-\\par
-PROPERTY MANAGER RESPONSIBILITIES:\\par
-\\par
-• Ensure access to all Named Areas during scheduled service times\\par
-• Notify tenants of service schedule and any temporary restrictions\\par
-• Communicate any special requests or concerns to account manager\\par
-• Report any property damage or unusual conditions promptly\\par
-\\par
-ADDITIONAL SERVICES:\\par
-\\par
-Our crew will notify you of any items requiring attention:\\par
-• Property damage requiring repair\\par
-• Graffiti removal needs\\par
-• Large item dumping requiring special disposal\\par
-• Maintenance issues affecting service delivery\\par
-\\par
-All additional services will be quoted separately with your approval.\\par
-\\par
-QUALITY ASSURANCE:\\par
-\\par
-• Regular supervisory inspections\\par
-• Direct communication line for service concerns\\par
-• Continuous improvement based on property needs\\par
-• Professional, uniformed, and insured service teams\\par
-}`;
-        }
-
-        function generateFSMRTF() {
-            const totalAcres = document.getElementById('totalAcres').value;
-            const frequency = document.getElementById('frequencySchedule').value;
-            const finalPrice = document.getElementById('finalClientPrice').textContent;
-            const grossProfit = document.getElementById('grossProfit').textContent;
-            const margin = document.getElementById('cityWideMargin').value;
-            
-            return `{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Times New Roman;}}
-\\f0\\fs24
-FSM JOB SUMMARY - EXTERIOR PORTER SERVICES\\par
-\\par
-Generated: ${new Date().toLocaleDateString()}\\par
-\\par
-PROPERTY OVERVIEW:\\par
-Total Acreage: ${totalAcres} acres\\par
-Service Frequency: ${frequency}\\par
-\\par
-FINANCIAL SUMMARY:\\par
-Monthly Client Price: ${finalPrice}\\par
-City Wide Gross Profit: ${grossProfit}\\par
-City Wide Margin: ${margin}%\\par
-\\par
-SCOPE OF WORK - NAMED AREAS:\\par
-1. EXTERIOR OF BUILDINGS\\par
-2. LANDSCAPING AREAS\\par
-3. PARKING LOTS\\par
-4. TRASH ENCLOSURES\\par
-\\par
-VENDOR MANAGEMENT QUESTIONS:\\par
-1. What size and type of sweeping equipment will you use?\\par
-2. Do you have backup equipment available?\\par
-3. How do you handle debris disposal, and are dump fees included?\\par
-4. What is your policy for weather delays and makeup services?\\par
-5. Can you provide photographic documentation of completed work?\\par
-6. Do you carry required insurance levels for Nevada commercial work?\\par
-7. How do you handle emergency cleanup requests outside regular schedule?\\par
-\\par
-CLIENT COMMUNICATION POINTS:\\par
-• Service performed ${frequency} covering all Named Areas\\par
-• Professional crews with commercial-grade equipment\\par
-• All debris removed and disposed of off-site\\par
-• Additional services quoted separately with approval\\par
-}`;
-        }
-
-        function downloadRTF(content, filename) {
-            const blob = new Blob([content], { type: 'application/rtf' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        // Initialize the calculator
-        document.addEventListener('DOMContentLoaded', function() {
-            updateNevadaRates();
-            updateICRateBreakdown();
-            updateCalculations();
-        });
-    </script>
-
-<div style="text-align:center;padding:18px 12px 24px;font-family:Verdana, &#39;Liberation Sans&#39;, &#39;DejaVu Sans&#39;, Geneva, Tahoma, sans-serif;font-size:11px;color:#636466;">City Wide Facility Solutions | <a href="https://www.gocitywide.com" style="color:#D22730;font-weight:bold;">GoCityWide.com</a></div>
-<!-- CW Save Results to Google Sheets -->
-<div id="cwSaveBar" style="position:fixed;bottom:18px;right:18px;z-index:9999;font-family:Verdana,'Liberation Sans','DejaVu Sans',Geneva,Tahoma,sans-serif;">
-<button id="cwSaveBtn" type="button" style="background:#D22730;color:#FFFFFF;border:none;border-radius:6px;padding:12px 20px;font-size:13px;font-weight:bold;font-family:inherit;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.25);">Save Results</button>
+  <div class="footer"><b>City Wide Facility Solutions</b> of Las Vegas &amp; Northern Nevada. Internal pricing tool. GoCityWide.com</div>
 </div>
-<script>
-(function(){
-  var CW_TOOL='porter';
-  var CW_HOOK='https://script.google.com/macros/s/AKfycbyZz6vEqjzdq0v15FVMfnrC5-lC_urvHe9aUI8LMaWHv_muqLGximMocH0_6IwB3mZOZQ/exec';
-  function txt(el){return (el.innerText||'').replace(/\s+/g,' ').trim();}
-  function vis(el){return !!(el.offsetWidth||el.offsetHeight||el.getClientRects().length);}
-  function labelFor(inp){
-    if(inp.id){var l=document.querySelector('label[for="'+inp.id+'"]');if(l&&txt(l))return txt(l);}
-    var w=inp.closest('label');if(w){var t=txt(w);if(t)return t;}
-    var p=inp.previousElementSibling;
-    while(p){if(/^(LABEL|H[1-6]|SPAN|DIV|P|STRONG|B)$/.test(p.tagName)){var t2=txt(p);if(t2&&t2.length<90)return t2;}p=p.previousElementSibling;}
-    var par=inp.parentElement;
-    if(par){var l2=par.querySelector('label');if(l2&&txt(l2))return txt(l2);
-      var pp=par.previousElementSibling;
-      while(pp){if(/^(LABEL|H[1-6]|SPAN|DIV|P|STRONG|B)$/.test(pp.tagName)){var t3=txt(pp);if(t3&&t3.length<90)return t3;}pp=pp.previousElementSibling;}}
-    return inp.name||inp.id||'Field';
-  }
-  function collect(){
-    var inputs=[];
-    document.querySelectorAll('input,select,textarea').forEach(function(el){
-      if(!vis(el))return;
-      if(el.closest('#cwSaveBar'))return;
-      if(el.type==='button'||el.type==='submit'||el.type==='hidden')return;
-      var v;
-      if(el.type==='checkbox'){v=el.checked?'Yes':'No';}
-      else if(el.type==='radio'){if(!el.checked)return;v=el.value;}
-      else if(el.tagName==='SELECT'){v=el.selectedIndex>=0?txt(el.options[el.selectedIndex])||el.value:'';}
-      else{v=el.value;}
-      if(v==null||String(v).trim()==='')return;
-      inputs.push([labelFor(el),String(v)]);
-    });
-    var results=[],seenR={};
-    document.querySelectorAll('.result-card,.result-box').forEach(function(card){
-      if(!vis(card))return;
-      var lab=card.querySelector('.result-label,h3,h4,.label')||null;
-      var val=card.querySelector('.result-value,.value')||null;
-      var L=lab?txt(lab):'',V=val?txt(val):'';
-      var unit=card.querySelector('.result-unit');if(unit&&V)V+=' '+txt(unit);
-      if(!V){var t=txt(card);if(L)t=t.replace(L,'').trim();V=t;}
-      if(!L&&!V)return;
-      var k=L+'|'+V;if(seenR[k])return;seenR[k]=1;
-      results.push([L,V]);
-    });
-    var details=[],seenD={};
-    document.querySelectorAll('body *').forEach(function(el){
-      if(el.children.length>0)return;
-      if(!vis(el))return;
-      if(el.closest('#cwSaveBar'))return;
-      if(el.closest('.result-card')||el.closest('.result-box'))return;
-      if(/^(INPUT|SELECT|TEXTAREA|OPTION|SCRIPT|STYLE|BUTTON|LABEL|A|TITLE)$/.test(el.tagName))return;
-      var t=txt(el);
-      if(!t||t.length>130)return;
-      if(!/\$\s?[\d,.]|[\d.]+\s?%/.test(t))return;
-      var lbl='';
-      var par=el.parentElement;
-      if(par){var pt=txt(par);if(pt!==t&&pt.length<170){lbl=pt.replace(t,'').replace(/[:\s]+$/,'').trim();}}
-      var k=lbl+'|'+t;if(seenD[k])return;seenD[k]=1;
-      details.push([lbl,t]);
-    });
-    var meta={};
-    var c=document.querySelector('#clientName,#client,input[id*="lient"]');
-    if(c&&c.value)meta.client=c.value;
-    var p=document.querySelector('#preparedBy,input[id*="repared"]');
-    if(p&&p.value)meta.preparedBy=p.value;
-    return {tool:CW_TOOL,title:document.title,url:location.href,meta:meta,
-      sections:[{title:'Inputs',rows:inputs},{title:'Results',rows:results},{title:'Detail Lines',rows:details}]};
-  }
-  var btn=document.getElementById('cwSaveBtn');
-  btn.addEventListener('click',function(){
-    btn.disabled=true;btn.textContent='Saving...';
-    var payload=JSON.stringify(collect());
-    fetch(CW_HOOK,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:payload})
-      .then(function(){btn.textContent='Saved to Google Sheets';btn.style.background='#0AA6A9';
-        setTimeout(function(){btn.textContent='Save Results';btn.style.background='#D22730';btn.disabled=false;},4000);})
-      .catch(function(){btn.textContent='Save failed, retry';btn.style.background='#2D2A26';btn.disabled=false;});
-  });
-})();
-</script>
 
+<div class="savemodal" id="saveModal" onclick="if(event.target===this)closeSaves()">
+  <div class="savebox">
+    <h3>Saved Work</h3>
+    <div id="saveList"></div>
+    <div style="margin-top:14px;text-align:right"><button class="btn btn-grey" style="flex:none" onclick="closeSaves()">Close</button></div>
+  </div>
+</div>
+
+<div id="printArea"></div>
+<script>
+/* City Wide Exterior Porter Calculator. Rebuilt July 2026. Rate factors aligned to the Bid Calculator Step 1b chain. */
+'use strict';
+const ENDPOINT='https://script.google.com/macros/s/AKfycbzfNnrpidCbWB1DeUNgXvRhDFMQgApfpn-3C9GU45wMEHcJpWFl8ZQVo6PUBSRfEVfRdg/exec';
+const LOGO='https://emailer.emfluence.com/clients/citywide/uploadedfiles/signature_logo.png';
+function $(id){return document.getElementById(id)}
+function money(n){return '$'+Math.round(n).toLocaleString()}
+function money2(n){return '$'+n.toFixed(2)}
+function num(v,d){const x=parseFloat(v);return isNaN(x)?d:x}
+
+/* ---------- REGIONS (porter wages: BLS OEWS May 2025 + July 2026 job boards; postings run below the OEWS janitor median) ---------- */
+const REGIONS={
+  lv:   {label:'Las Vegas', mult:1.00, wages:{porter:16.0},
+         note:'Competitive baseline. Summer routes run early morning: the Nevada OSHA heat rule (enforced since April 2025) requires a written heat plan, water and rest breaks. Wind pushes litter to fence lines and desert edges.'},
+  reno: {label:'Reno / Sparks', mult:1.10, wages:{porter:16.5},
+         note:'Northern Nevada premium: tighter labor pool and fewer route vendors. Winter adds entry ice-melt service and slip-and-fall photo logs. Leaf fall spikes stop times in October and November.'},
+  carson:{label:'Carson City', mult:1.10, wages:{porter:16.5},
+         note:'Same band as Reno with a harder freeze and an earlier winter. Ice melt season starts in November.'},
+  tric: {label:'TRIC / USA Parkway', mult:1.18, wages:{porter:18.0},
+         note:'Industrial corridor: big lots, wind-blown debris on the fence lines, and long deadhead between stops. Almost nobody runs routes out here. Trip time is real cost: price it.'}
+};
+
+/* ---------- RATE BOOK (editable; stop-time anchors from Cleanlots route economics + BSCAI production guidance) ---------- */
+const DEFAULT_RB={
+ litterMinAcre:{v:15, label:'Litter pass minutes per maintained acre', note:'Cleanlots route anchors: a half-acre strip pad runs about 5 minutes, a 4-6 acre power center runs an hour. Condition and debris level multiply this.'},
+ canMin:  {v:2.5, label:'Minutes per exterior trash can (empty, reline, wipe lid)', note:'Interior benchmark is 1 min/can. Exterior adds walk distance and bag carry.'},
+ dumpMin: {v:3,   label:'Minutes per dumpster corral (police, doors, overflow)', note:''},
+ zoneMin: {v:3,   label:'Minutes per hand-pick zone (entries, butt cans, patios)', note:'Cigarette-butt policing at entries is the single biggest adder on retail. 15-20% of route time goes here.'},
+ arriveMin:{v:5,  label:'Fixed arrival minutes per visit (park, unload, log, photos)', note:''},
+ linerCost:{v:0.35,label:'Liner cost $ per can per visit', note:'Contractor-grade can liners by the case.'},
+ suppliesMo:{v:100,label:'Dedicated porter supplies $ per month (liners, PPE, bags, water)', note:'Route liners price per can instead. Summer water and electrolytes live here: the heat rule requires them.'},
+ minVisit:{v:35,  label:'Minimum charge per route visit $', note:'Covers a 20 minute stop plus drive at route economics. Nobody profitable rolls a truck for less.'},
+ vehVisit:{v:6,   label:'Route vehicle $ per visit (fuel, wear, insurance)', note:'IRS 2026 mileage runs $0.75/mi. Ten to fifteen urban miles between stops.'},
+ iceMin:  {v:4,   label:'Ice melt minutes per entry per application', note:'NNV winter service, entries and door aprons only.'},
+ iceProd: {v:2.50,label:'Ice melt product $ per entry per application', note:'Verify against bag price by the pallet each fall.'},
+ haulHrs: {v:1.5, label:'Crew hours per bulk item haul', note:'Load, secure, drive, tip. Dump fees pass through at cost on top.'}
+};
+
+/* Equipment $/crew-hour by kind (blower, cart, grabbers, PPE amortized; truck priced per visit in the Rate Book) */
+const EQUIP={dedicated:1.5, route:2, storm:3, ice:2, haul:8, clean:4};
+
+/* Rate factors, aligned to Bid Calculator Step 1b */
+const BURDEN=0.15;        /* payroll burden on wages */
+const INCIDENTALS=0.04;   /* room for what we are not considering: 4% of labor */
+const IC_MARGIN=0.08;     /* crew company margin, divide basis: cost / (1 - 8%), same math as the Bid Calculator */
+const VENDOR_MAT_MARKUP=0.15;
+const MIN_MONTHLY=250;
+function autoMargin(annualHrs){ if(annualHrs<40)return 40; if(annualHrs<100)return 38; if(annualHrs<250)return 36; if(annualHrs<500)return 34; if(annualHrs<900)return 33; return 32; }
+
+const CONDITIONS=[{k:'good',label:'Maintained',f:1},{k:'behind',label:'Behind (catch-up)',f:1.25},{k:'neglect',label:'Neglected takeover',f:1.5}];
+const DEBRIS=[['0.85','Office park (light debris)'],['1','Retail center (moderate)'],['1.3','Food service / QSR (heavy)'],['1.15','Industrial (wind and pallet debris)']];
+
+/* ---------- SERVICES ---------- */
+const SERVICES=[
+ {id:'route', name:'Route Visit Program', sub:'A porter truck stops by on a schedule: litter pass, cans, corrals, entries. The bread and butter', ico:'route', mode:'monthly', wageKey:'porter', equip:EQUIP.route,
+  flatLabel:'Flat Pass-Through $/yr (gate keys, badging, extra disposal)',
+  desc:'Scheduled route visits: full litter pass of the lot, sidewalks and beds, exterior trash cans emptied and relined, dumpster corrals policed with doors checked, entry and butt-can zones hand-picked, and a photo log on every stop. The right model for most properties: coverage without paying for idle hours.',
+  fields:[
+   {k:'acres',label:'Maintained Acres',src:'map',ph:'0',small:'Lot, walks and beds the porter covers. Trace it on Google Earth.'},
+   {k:'cans',label:'Exterior Trash Cans',src:'walk',ph:'0',small:'Count them on the walk. Every can is empty, reline, wipe.'},
+   {k:'dumps',label:'Dumpster Corrals',src:'walk',ph:'0',small:''},
+   {k:'zones',label:'Hand-Pick Zones (entries, butt cans, patios)',src:'walk',ph:'0',small:'Where cigarette butts and wrappers pile up. Retail entries count one each.'},
+   {k:'debris',label:'Debris Level',src:'walk',type:'select',opts:DEBRIS,small:'Food service runs heavy. Industrial catches the wind.'},
+   {k:'cond',label:'Condition',src:'walk',type:'select',opts:[['good','Maintained'],['behind','Behind (catch-up)'],['neglect','Neglected takeover']],small:'A neglected takeover also needs the First Clean service below.'},
+   {k:'visitsWk',label:'Visits per Week',src:'ask',type:'select',opts:[[7,'7 (daily)'],[6,'6'],[5,'5 (weekdays, standard)'],[3,'3 (Mon/Wed/Fri)'],[2,'2 (Mon/Thu)'],[1,'1 (weekly)']],small:'Match what the property expects. Retail wants 5 or better.'},
+   {k:'driveMin',label:'Drive Minutes per Visit',src:'ask',ph:'10',small:'Deadhead allocated to this stop. Tight route clusters keep this small: that is where route profit lives.'}
+  ],
+  compute:function(st,region,RB){
+   const acres=num(st.acres,0),cans=num(st.cans,0),dumps=num(st.dumps,0),zones=num(st.zones,0);
+   if(!acres&&!cans&&!dumps&&!zones)return null;
+   const condF=(CONDITIONS.find(c=>c.k===(st.cond||'good'))||CONDITIONS[0]).f;
+   const debrisF=parseFloat(st.debris)||1;
+   const visitsWk=num(st.visitsWk,5);
+   const visits=visitsWk*52;
+   const visitMin=acres*RB.litterMinAcre.v*condF*debrisF + cans*RB.canMin.v + dumps*RB.dumpMin.v + zones*RB.zoneMin.v + RB.arriveMin.v;
+   const onsiteHrs=visitMin/60*visits;
+   const driveHrs=num(st.driveMin,10)/60*visits;
+   const manHrs=onsiteHrs+driveHrs;
+   const liners=cans*visits*RB.linerCost.v;
+   return {manHrs, matLines:liners?[{label:'Can liners ('+cans+' cans x '+visits+' visits @ '+money2(RB.linerCost.v)+')',cost:liners}]:[],
+     extraLines:[{label:'Route vehicle ('+visits+' visits @ '+money2(RB.vehVisit.v)+'/visit)',cost:visits*RB.vehVisit.v}],
+     equipHrs:manHrs, events:1, visits:visits, onsiteHrs:onsiteHrs,
+     unitQty:onsiteHrs, unitName:'on-site hr', unitDiv:1, mktLo:32, mktHi:58,
+     rateOvQty:visits, rateOvLabel:'Price per Visit Override $',
+     minVisitFloor:true,
+     detail:visitMin.toFixed(0)+' min per visit ('+(visitMin-RB.arriveMin.v).toFixed(0)+' min work + '+RB.arriveMin.v+' min arrival) x '+visits+' visits/yr + '+driveHrs.toFixed(0)+' hrs/yr drive time'};
+  }},
+ {id:'dedicated', name:'Dedicated On-Site Porter', sub:'Your porter, on the property, on a shift. Class A retail, campuses, big centers', ico:'porter', mode:'monthly', wageKey:'porter', equip:EQUIP.dedicated,
+  flatLabel:'Flat Pass-Through $/yr (badging, parking, uniforms beyond standard)',
+  desc:'A dedicated porter on a set shift: continuous litter policing, cans and corrals, spill response, cart corrals, cobwebs and door glass, and eyes on the property all shift with photo reporting. The model for Class A retail, resort-adjacent centers, and campuses where presence is the product.',
+  fields:[
+   {k:'porters',label:'Porters on Shift',src:'ask',ph:'1',small:''},
+   {k:'hrsDay',label:'Hours per Day',src:'ask',ph:'4',small:'Half-day coverage (4 hrs) fits most centers. Summer shifts start early: the heat rule is real.'},
+   {k:'daysWk',label:'Days per Week',src:'ask',type:'select',opts:[[7,'7 (daily)'],[6,'6'],[5,'5 (weekdays, standard)'],[4,'4'],[3,'3']],small:''}
+  ],
+  compute:function(st,region,RB){
+   const porters=num(st.porters,1),hrsDay=num(st.hrsDay,0),daysWk=num(st.daysWk,5);
+   if(!hrsDay)return null;
+   const manHrs=porters*hrsDay*daysWk*52;
+   const supplies=RB.suppliesMo.v*12*porters;
+   return {manHrs, matLines:[{label:'Supplies allowance ('+money(RB.suppliesMo.v)+'/mo per porter: liners, PPE, water)',cost:supplies}], extraLines:[],
+     equipHrs:manHrs, events:1,
+     unitQty:manHrs, unitName:'billed hr', unitDiv:1, mktLo:25, mktHi:38,
+     rateOvQty:12, rateOvLabel:'Monthly Price Override $',
+     detail:porters+' porter'+(porters>1?'s':'')+' x '+hrsDay+' hrs/day x '+daysWk+' days/wk = '+Math.round(manHrs/12)+' hrs/mo'};
+  }},
+ {id:'storm', name:'Storm & Monsoon Debris Pass', sub:'After-storm cleanup: fronds, mud, scattered trash. LV monsoon season, NNV wind events', ico:'storm', mode:'peryear', wageKey:'porter', equip:EQUIP.storm,
+  flatLabel:'Extra Disposal $/yr (at cost)',
+  desc:'A scheduled allowance for after-storm passes: palm fronds and branches, mud at drive aprons, scattered dumpster overflow, wind-blown debris on the fence lines. Sold as an included number of passes with a cap; a real storm blowout beyond the cap quotes as time and materials.',
+  fields:[
+   {k:'events',label:'Storm Passes per Year',src:'ask',type:'select',opts:[[4,'4 (LV monsoon standard)'],[2,'2'],[6,'6 (exposed / desert edge)'],[8,'8']],small:'Mid-June through September is monsoon season in LV. NNV gets wind events year-round.'},
+   {k:'crewHrs',label:'Crew Hours per Pass',src:'walk',ph:'3',small:'Walk the property and estimate. A mid-size center runs 2-4 hours per pass.'}
+  ],
+  compute:function(st,region,RB){
+   const events=num(st.events,4),crewHrs=num(st.crewHrs,0);
+   if(!crewHrs)return null;
+   const manHrs=events*crewHrs;
+   return {manHrs, matLines:[], extraLines:[], equipHrs:manHrs, events:events,
+     unitQty:manHrs, unitName:'crew-hr', unitDiv:1, mktLo:40, mktHi:65,
+     rateOvQty:events, rateOvLabel:'Price per Pass Override $',
+     detail:events+' passes x '+crewHrs+' crew-hrs.'};
+  }},
+ {id:'icemelt', name:'Entry Ice Melt Service (NNV)', sub:'Doors and walk aprons salted before opening. November through March', ico:'ice', mode:'peryear', wageKey:'porter', equip:EQUIP.ice,
+  flatLabel:'Flat Pass-Through $/yr',
+  desc:'Winter mornings in Reno, Sparks and Carson: ice melt applied at entries, door aprons and walk transitions before the property opens, with a photo log that doubles as slip-and-fall documentation. Product billed through the build-up. Plowing and full de-icing stay with the snow contractor.',
+  fields:[
+   {k:'entries',label:'Entries / Door Aprons',src:'walk',ph:'0',small:'Count doors the public uses, plus ramps.'},
+   {k:'apps',label:'Applications per Season',src:'ask',type:'select',opts:[[20,'20 (standard Reno winter)'],[30,'30 (heavy / Carson)'],[10,'10 (light)']],small:'Freeze mornings, not calendar days.'}
+  ],
+  compute:function(st,region,RB){
+   const entries=num(st.entries,0); if(!entries)return null;
+   const apps=num(st.apps,20);
+   const manHrs=entries*apps*RB.iceMin.v/60;
+   const prod=entries*apps*RB.iceProd.v;
+   return {manHrs, matLines:[{label:'Ice melt product ('+entries+' entries x '+apps+' apps @ '+money2(RB.iceProd.v)+')',cost:prod}], extraLines:[], equipHrs:manHrs, events:apps,
+     unitQty:entries*apps, unitName:'entry-app', unitDiv:1, mktLo:5, mktHi:12,
+     rateOvQty:entries*apps, rateOvLabel:'Price per Entry-App Override $',
+     detail:entries+' entries x '+apps+' applications. Verify product price by the pallet each fall.'};
+  }},
+ {id:'hauls', name:'Bulk Item & Illegal Dump Hauls', sub:'Mattresses, pallets, tenant dump-outs. Per haul, dump fees at cost', ico:'haul', mode:'peryear', wageKey:'porter', equip:EQUIP.haul,
+  flatLabel:'Dump Fees $/yr (at cost)',
+  desc:'The mattress by the dumpster and the pallet stack behind the pad building. Priced as an annual allowance of hauls so the property manager stops getting nickeled: load, secure, drive, tip, photo. Dump fees pass through at cost. Hazmat, tires and appliances with refrigerant quote separately.',
+  fields:[
+   {k:'hauls',label:'Hauls per Year (estimate)',src:'ask',ph:'6',small:'Ask the PM how often junk shows up. Retail with alley access runs high.'}
+  ],
+  compute:function(st,region,RB){
+   const hauls=num(st.hauls,0); if(!hauls)return null;
+   const manHrs=hauls*RB.haulHrs.v;
+   return {manHrs, matLines:[], extraLines:[], equipHrs:manHrs, events:hauls,
+     unitQty:hauls, unitName:'haul', unitDiv:1, mktLo:50, mktHi:150,
+     rateOvQty:hauls, rateOvLabel:'Price per Haul Override $',
+     detail:hauls+' hauls x '+RB.haulHrs.v+' crew-hrs each. Dump fees ride on top at cost.'};
+  }},
+ {id:'firstclean', name:'First Clean / Takeover Catch-Up', sub:'Get a neglected property back to route-maintainable before the contract starts', ico:'broom', mode:'once', wageKey:'porter', equip:EQUIP.clean,
+  flatLabel:'Dump Fees + Bin $ (at cost)',
+  desc:'The catch-up push before a takeover: fence lines, landscape beds full of wind litter, overflowing corrals, cobwebs and gum buildup at entries. Sell it as its own project so the route starts from maintainable instead of eating months of catch-up.',
+  fields:[
+   {k:'hrs',label:'Estimated Crew Hours',src:'walk',ph:'0',small:'Walk it and estimate honestly. A neglected 3-acre center commonly runs 12-24 crew-hours.'}
+  ],
+  compute:function(st,region,RB){
+   const hrs=num(st.hrs,0); if(!hrs)return null;
+   return {manHrs:hrs, matLines:[], extraLines:[], equipHrs:hrs, events:1,
+     unitQty:hrs, unitName:'crew-hr', unitDiv:1, mktLo:45, mktHi:70,
+     rateOvQty:1, rateOvLabel:'Total Price Override $',
+     detail:hrs+' crew-hours estimated on the walk.'};
+  }}
+];
+
+const ICONS={
+ route:'<svg viewBox="0 0 24 24"><path d="M4 17h12l3-4h2"/><circle cx="8" cy="19" r="1.7"/><circle cx="15" cy="19" r="1.7"/><rect x="3" y="9" width="10" height="6" rx="1"/><path d="M13 11h4l2 2"/></svg>',
+ porter:'<svg viewBox="0 0 24 24"><circle cx="10" cy="5" r="2.2"/><path d="M10 8v6M10 10l4-1M10 14l-2 6M10 14l3 6"/><path d="M17 8v12M15 20h4M17 8l2-2"/></svg>',
+ storm:'<svg viewBox="0 0 24 24"><path d="M6 12a5 5 0 1 1 1-9.9A6 6 0 0 1 18 4a4.5 4.5 0 0 1 1 8.9"/><path d="M12 13l-3 5h4l-3 5"/><path d="M6 15l-1 3M19 15l-1 3"/></svg>',
+ ice:'<svg viewBox="0 0 24 24"><path d="M12 3v18M12 3l-2 3M12 3l2 3M12 21l-2-3M12 21l2-3M4 7l16 10M4 7l3.5-.5M4 7l.5 3.5M20 17l-3.5.5M20 17l-.5-3.5M20 7L4 17M20 7l-3.5-.5M20 7l-.5 3.5M4 17l3.5.5M4 17l.5-3.5"/></svg>',
+ haul:'<svg viewBox="0 0 24 24"><path d="M2 16h13V8h4l3 4v4h-2"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/><path d="M5 8V5h6v3"/></svg>',
+ broom:'<svg viewBox="0 0 24 24"><path d="M19 3l-8 8"/><path d="M11 11l-6 2 1 6 6-1 2-6z"/><path d="M6 13l4 4"/></svg>'
+};
+
+/* ---------- STATE ---------- */
+let S={svcOn:{}, inputs:{}, user:localStorage.getItem('cwpx_user')||''};
+let RB=JSON.parse(JSON.stringify(DEFAULT_RB));
+try{const saved=localStorage.getItem('cwpx_rb'); if(saved){const p=JSON.parse(saved); Object.keys(RB).forEach(k=>{if(p[k]&&typeof p[k].v==='number')RB[k].v=p[k].v;});}}catch(e){}
+function setSvc(id,field,val){if(!S.inputs[id])S.inputs[id]={};S.inputs[id][field]=val;recalc();autosaveSoon();}
+
+/* ---------- PRICING ENGINE (Bid Calculator Step 1b chain) ---------- */
+function priceService(s){
+  const st=S.inputs[s.id]||{};
+  const region=REGIONS[$('region').value];
+  const c=s.compute(st,region,RB);
+  if(!c)return null;
+
+  /* 1. raw labor + payroll burden */
+  const wage=num(st.wage,region.wages[s.wageKey]);
+  const laborCost=c.manHrs*wage*(1+BURDEN);
+
+  /* 2. incidentals: room for what nobody itemized */
+  const incCost=laborCost*INCIDENTALS;
+
+  /* 3. supplies & product */
+  const matCost=c.matLines.reduce((a,m)=>a+m.cost,0);
+
+  /* 4. equipment + vehicle + flat pass-throughs (pass-throughs at cost, no margin) */
+  const equipRate=num(st.equip,s.equip);
+  const equipCost=c.equipHrs*equipRate;
+  const extraCost=(c.extraLines||[]).reduce((a,m)=>a+m.cost,0);
+  const flatCost=num(st.flat,0);
+
+  /* 5. crew company margin: divide basis, same as the Bid Calculator */
+  const matProvider=$('matProvider').value;
+  const vendorMat=matProvider==='vendor'?matCost*(1+VENDOR_MAT_MARKUP):0;
+  const cwMat=matProvider==='cw'?matCost:0;
+  const vendorBase=laborCost+incCost+equipCost+extraCost+vendorMat;
+  const inhouse=($('laborBy')&&$('laborBy').value==='inhouse');
+  const vendorCost=inhouse?vendorBase:vendorBase/(1-IC_MARGIN);
+  const totalCost=vendorCost+cwMat;
+
+  /* 6. City Wide margin + regional multiplier. Pass-throughs ride at cost. */
+  const ov=parseFloat($('ovMargin').value);
+  const svcOv=parseFloat(st.margin);
+  const margin=(!isNaN(svcOv)&&svcOv>0)?svcOv:(!isNaN(ov)&&ov>0)?ov:autoMargin(c.manHrs);
+  let price=totalCost/(1-margin/100)*region.mult+flatCost;
+  let floored=false;
+  if(c.minVisitFloor&&c.visits){const fl=c.visits*RB.minVisit.v*region.mult+flatCost; if(price<fl){price=fl;floored=true;}}
+  const rateOv=parseFloat(st.rateOv);
+  if(!isNaN(rateOv)&&rateOv>0){price=rateOv*(c.rateOvQty||1)+flatCost;floored=false;}
+  const perUnit=c.unitQty?((price-flatCost)/(c.unitDiv||1))/c.unitQty:0;
+  const mktLo=c.mktLo*region.mult, mktHi=c.mktHi*region.mult;
+  const monthly=s.mode==='monthly'?price/12:0;
+  return {s,st,c,wage,laborCost,incCost,matCost,vendorMat,cwMat,equipCost,equipRate,extraCost,flatCost,vendorBase,vendorCost,inhouse,totalCost,margin,price,monthly,perUnit,mktLo,mktHi,floored};
+}
+function activeResults(){return SERVICES.filter(s=>S.svcOn[s.id]).map(priceService).filter(Boolean);}
+function applyMinimums(results){
+  const monthlies=results.filter(r=>r.s.mode==='monthly');
+  const override=$('minOverride').checked;
+  let minMsg='';
+  const monthlyTotal=monthlies.reduce((a,r)=>a+r.monthly,0);
+  let adjMonthly=monthlyTotal;
+  if(monthlies.length&&monthlyTotal>0&&monthlyTotal<MIN_MONTHLY){
+    if(!override){adjMonthly=MIN_MONTHLY;minMsg='Monthly contract raised to the '+money(MIN_MONTHLY)+' minimum. A truck does not roll for less.';}
+    else{minMsg='Minimum overridden ('+($('minReason').value||'no reason given')+'). Monthly stands at computed '+money(monthlyTotal)+'.';}
+  }
+  const flooredRoute=results.find(r=>r.floored);
+  if(flooredRoute&&!minMsg)minMsg='Route priced at the '+money(RB.minVisit.v)+'/visit floor. Type a per-visit override to price it differently.';
+  return {monthlyTotal,adjMonthly,minMsg};
+}
+
+/* ---------- RENDER: SERVICE CARDS ---------- */
+function srcTag(src){
+  if(src==='walk')return '<span class="srctag src-walk">WALK</span>';
+  if(src==='map')return '<span class="srctag src-map">MAP</span>';
+  if(src==='ask')return '<span class="srctag src-ask">ASK</span>';
+  return '';
+}
+const SELECT_DEFAULTS={debris:'1',cond:'good',visitsWk:'5',daysWk:'5',events:'4',apps:'20'};
+function fieldHtml(s,f,st){
+  const val=(f.k in st)?st[f.k]:'';
+  let inner='';
+  if(f.type==='select'){
+    let def=val===''?(SELECT_DEFAULTS[f.k]!==undefined?SELECT_DEFAULTS[f.k]:''+f.opts[0][0]):''+val;
+    inner='<select onchange="setSvc(\''+s.id+'\',\''+f.k+'\',this.value)">'+f.opts.map(o=>'<option value="'+o[0]+'"'+((''+def)===(''+o[0])?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>';
+  }else{
+    inner='<input type="number" step="any" value="'+val+'" placeholder="'+(f.ph||'')+'" onchange="setSvc(\''+s.id+'\',\''+f.k+'\',this.value)">';
+  }
+  return '<div class="field"><label>'+f.label+srcTag(f.src)+'</label>'+inner+(f.small?'<small>'+f.small+'</small>':'')+'</div>';
+}
+function renderServices(){
+  const region=REGIONS[$('region').value];
+  const wrap=$('svcList');
+  wrap.innerHTML=SERVICES.map(s=>{
+    const on=!!S.svcOn[s.id];
+    const st=S.inputs[s.id]||{};
+    const r=on?priceService(s):null;
+    let body='';
+    if(on){
+      body='<div class="svc-grid">'
+      +s.fields.map(f=>fieldHtml(s,f,st)).join('')
+      +'<div class="field"><label>Porter Wage $/hr'+srcTag('ask')+'</label><input type="number" step="0.5" value="'+(st.wage||'')+'" placeholder="'+region.wages[s.wageKey].toFixed(2)+'" onchange="setSvc(\''+s.id+'\',\'wage\',this.value)"><small>What the crew actually pays. Prepopulated for '+region.label+' from 2026 postings. Route drivers and working leads run $24-28.</small></div>'
+      +'<div class="field"><label>Equipment $/hr</label><input type="number" step="0.5" value="'+(st.equip||'')+'" placeholder="'+s.equip+'" onchange="setSvc(\''+s.id+'\',\'equip\',this.value)"><small>Blower, cart, grabbers, PPE amortized.</small></div>'
+      +'<div class="field"><label>'+s.flatLabel+'</label><input type="number" step="10" value="'+(('flat' in st)?st.flat:'')+'" placeholder="0" onchange="setSvc(\''+s.id+'\',\'flat\',this.value)"><small>Billed at cost. Margin applies to work, not dump fees and badges.</small></div>'
+      +'<div class="field"><label>'+(r?r.c.rateOvLabel:'Price Override $')+'</label><input type="number" step="0.01" value="'+(st.rateOv||'')+'" placeholder="auto build-up" onchange="setSvc(\''+s.id+'\',\'rateOv\',this.value)"></div>'
+      +'<div class="field"><label>Service Margin % Override</label><input type="number" value="'+(st.margin||'')+'" placeholder="auto '+(r?r.margin:'32-40')+'" onchange="setSvc(\''+s.id+'\',\'margin\',this.value)"></div>'
+      +'</div>';
+      if(r){
+        const flag=r.perUnit>=r.mktLo&&r.perUnit<=r.mktHi?'<span class="mktflag ok">inside market range</span>':(r.perUnit<r.mktLo?'<span class="mktflag warn">below market, room to hold price</span>':'<span class="mktflag warn">above market, check inputs or expect pushback</span>');
+        body+='<div class="buildup">'
+        +(r.c.detail?'<div class="bl mkt"><span>'+r.c.detail+'</span></div>':'')
+        +'<div class="bl"><span>Porter labor: '+r.c.manHrs.toFixed(1)+' hrs/yr @ $'+r.wage.toFixed(2)+' + '+(BURDEN*100)+'% payroll burden</span><b>'+money(r.laborCost)+'</b></div>'
+        +'<div class="bl"><span>Incidentals &amp; unlisted supplies ('+(INCIDENTALS*100)+'% of labor)</span><b>'+money(r.incCost)+'</b></div>'
+        +r.c.matLines.map(m=>'<div class="bl"><span>'+m.label+'</span><b>'+money(m.cost)+'</b></div>').join('')
+        +(r.vendorMat&&r.matCost?'<div class="bl"><span>Crew procurement markup on supplies ('+(VENDOR_MAT_MARKUP*100)+'%)</span><b>'+money(r.vendorMat-r.matCost)+'</b></div>':'')
+        +(r.c.extraLines||[]).map(m=>'<div class="bl"><span>'+m.label+'</span><b>'+money(m.cost)+'</b></div>').join('')
+        +'<div class="bl"><span>Equipment fee ('+r.c.equipHrs.toFixed(1)+' hrs @ $'+r.equipRate+'/hr)</span><b>'+money(r.equipCost)+'</b></div>'
+        +(r.inhouse?'':'<div class="bl"><span>Crew company margin ('+(IC_MARGIN*100).toFixed(0)+'% of their check, Bid Calculator math)</span><b>'+money(r.vendorCost-r.vendorBase)+'</b></div>')
+        +'<div class="bl tot"><span>'+(r.inhouse?'In-house crew cost':'We pay the crew')+(r.cwMat?' (City Wide supplies product: '+money(r.cwMat)+')':'')+'</span><b>'+money(r.totalCost)+'</b></div>'
+        +(r.flatCost?'<div class="bl"><span>Pass-through at cost</span><b>'+money(r.flatCost)+'</b></div>':'')
+        +'<div class="bl tot" style="color:var(--cw-red)"><span>'+(r.s.mode==='monthly'?'Annual @ '+r.margin+'% margin x '+REGIONS[$('region').value].mult.toFixed(2)+' regional = '+money(r.price)+'</span><b>'+money(r.price/12)+'/mo</b>':'Client price @ '+r.margin+'% margin x '+REGIONS[$('region').value].mult.toFixed(2)+' regional</span><b>'+money(r.price)+(r.s.mode==='peryear'?'/yr':'')+'</b>')+'</div>'
+        +(r.floored?'<div class="bl mkt"><span>Cost build-up came in under the per-visit floor. Priced at '+money2(RB.minVisit.v)+'/visit: type a per-visit override to price it differently.</span></div>':'')
+        +(r.c.visits?'<div class="bl mkt"><span>Per visit: '+money2((r.price-r.flatCost)/r.c.visits)+'</span></div>':'')
+        +'<div class="bl mkt"><span>2026 market check: '+money2(r.mktLo)+'-'+money2(r.mktHi)+' per '+r.c.unitName+' here (this quote: '+money2(r.perUnit)+'). '+flag+'</span></div>'
+        +'</div>';
+      }
+      body+=howTo(s);
+    }
+    let priceTag='';
+    if(on&&r){
+      if(s.mode==='monthly')priceTag='<div class="svc-price">'+money(r.monthly)+'/mo<small>'+money(r.price)+'/yr</small></div>';
+      else if(s.mode==='peryear')priceTag='<div class="svc-price">'+money(r.price)+'/yr<small>billed when performed</small></div>';
+      else priceTag='<div class="svc-price">'+money(r.price)+'<small>one-time</small></div>';
+    }
+    return '<div class="svc-card'+(on?' on':'')+'" id="svc-'+s.id+'">'
+    +'<div class="svc-head" onclick="toggleSvc(\''+s.id+'\')">'
+    +'<div class="svc-ico">'+ICONS[s.ico]+'</div>'
+    +'<div class="t"><b>'+s.name+'</b><span>'+s.sub+'</span></div>'
+    +priceTag
+    +'<div class="svc-toggle"></div></div>'
+    +'<div class="svc-body">'+body+'</div></div>';
+  }).join('');
+}
+function toggleSvc(id){S.svcOn[id]=!S.svcOn[id];recalc();autosaveSoon();}
+
+/* ---------- HOW-TO EDUCATION PER SERVICE ---------- */
+function howTo(s){
+  const H={
+   route:'<h4>Where the inputs come from</h4><ul><li><b>MAP:</b> trace the maintained acreage on Google Earth. Five minutes from your desk.</li><li><b>WALK:</b> count cans, corrals and hand-pick zones, and judge condition and debris level with your own eyes.</li><li><b>ASK:</b> frequency expectation and gate access from the property manager.</li></ul><h4>How the price builds</h4><ol><li>Minutes per visit build from the counts. Every visit pays the arrival minutes first.</li><li>Drive time is allocated per stop. Cluster your stops: route density is the whole profit model.</li><li>Annual hours x wage x burden, plus liners, vehicle, equipment, incidentals, crew margin, City Wide margin. Divide by 12.</li></ol><div class="warnbox">Summer in Las Vegas moves routes to early morning, roughly 4 to 10 am. The Nevada OSHA heat rule requires the crew to carry a written heat illness plan with water and rest breaks. Verify it before the first July visit, not after.</div>',
+   dedicated:'<h4>When dedicated beats a route</h4><p>When the property wants presence: someone visible, responsive, and reachable all shift. Class A retail, resort-adjacent centers, medical campuses. The porter does everything the route does plus spill response, cart corrals, cobwebs, door glass, and tenant requests.</p><h4>Pricing check</h4><p>The build-up lands as a billed rate per hour. Las Vegas dedicated porter service bills $25-38 in 2026; Northern Nevada runs about 10 percent higher. If your number is outside that band, check the wage and supplies before assuming the tool is wrong.</p>',
+   storm:'<h4>Selling it right</h4><p>Put a fixed number of passes in the contract with a cap. After a named storm or a blowout beyond the cap, quote time and materials. The property manager gets a budget number, we do not eat a hundred-year monsoon.</p>',
+   icemelt:'<h4>The winter pitch</h4><p>The photo log is the product: timestamped proof the entries were treated before opening. That documentation is what a property manager shows the insurance carrier after a slip claim. Plowing and lot de-icing stay with the snow contractor: this service is doors and walks only.</p>',
+   hauls:'<h4>Scope protection</h4><p>Keep it porter work: mattresses, pallets, furniture, boxed junk. Hazmat, tires, refrigerant appliances and construction debris quote separately. Hauling as a business of its own carries a different workers comp class, so the crew doing it as an occasional add-on to porter service is the right structure.</p>',
+   firstclean:'<h4>Scoping the takeover</h4><ol><li>Walk the whole property including the fence lines and the back of the pads.</li><li>Estimate crew hours honestly. A neglected 3-acre center commonly runs 12-24.</li><li>Get dump fees as a pass-through number.</li></ol><div class="warnbox">Never fold catch-up into the monthly. The route price assumes a maintainable property. Sell the first clean as a project and the route starts clean for both sides.</div>'
+  };
+  return H[s.id]?'<details class="howto"><summary>How to measure &amp; quote this</summary><div class="hbody">'+H[s.id]+'</div></details>':'';
+}
+
+/* ---------- SHOPPING / SUPPLIES LIST ---------- */
+function renderShopping(results){
+  const items=[];
+  results.forEach(r=>{
+    r.c.matLines.forEach(m=>items.push({svc:r.s.name,label:m.label,cost:m.cost}));
+    (r.c.extraLines||[]).forEach(m=>items.push({svc:r.s.name,label:m.label,cost:m.cost}));
+    if(r.flatCost)items.push({svc:r.s.name,label:'Pass-through (at cost)',cost:r.flatCost});
+  });
+  if(!items.length){$('shopCard').style.display='none';return;}
+  $('shopCard').style.display='';
+  $('shopList').innerHTML='<table style="width:100%;border-collapse:collapse;font-size:12px">'
+  +'<tr><th style="text-align:left;padding:6px;background:var(--cw-light)">Service</th><th style="text-align:left;padding:6px;background:var(--cw-light)">Item</th><th style="text-align:right;padding:6px;background:var(--cw-light)">Annual $</th></tr>'
+  +items.map(i=>'<tr><td style="padding:6px;border-bottom:1px solid var(--cw-border)">'+i.svc+'</td><td style="padding:6px;border-bottom:1px solid var(--cw-border)">'+i.label+'</td><td style="padding:6px;border-bottom:1px solid var(--cw-border);text-align:right;font-weight:700">'+money(i.cost)+'</td></tr>').join('')
+  +'</table>';
+}
+
+/* ---------- RECALC & SUMMARY ---------- */
+function recalc(){
+  const region=REGIONS[$('region').value];
+  $('regionNote').textContent=region.note;
+  renderServices();
+  const results=activeResults();
+  const {monthlyTotal,adjMonthly,minMsg}=applyMinimums(results);
+  const monthlies=results.filter(r=>r.s.mode==='monthly');
+  const enh=results.filter(r=>r.s.mode!=='monthly');
+  const showInt=$('showInternal').checked;
+  let h='';
+  if(monthlies.length){
+    h+='<div class="sline cat"><span class="n">Monthly Contract</span><span></span></div>';
+    monthlies.forEach(r=>{h+='<div class="sline sub"><span class="n">'+r.s.name+'</span><span>'+money(r.monthly)+'/mo</span></div>';
+      if(showInt)h+='<div class="sline sub" style="color:#8f8d8a"><span class="n">cost '+money(r.totalCost/12)+'/mo, margin '+r.margin+'%</span><span></span></div>';});
+  }
+  if(enh.length){
+    h+='<div class="sline cat"><span class="n">Extras (billed when performed)</span><span></span></div>';
+    enh.forEach(r=>{h+='<div class="sline sub"><span class="n">'+r.s.name+'</span><span>'+money(r.price)+(r.s.mode==='peryear'?'/yr':'')+'</span></div>';
+      if(showInt)h+='<div class="sline sub" style="color:#8f8d8a"><span class="n">cost '+money(r.totalCost+r.flatCost)+', margin '+r.margin+'%</span><span></span></div>';});
+  }
+  $('sumLines').innerHTML=h||'<div style="font-size:12px;color:#bdbbb8">Turn on services to build the quote.</div>';
+  $('sumTotal').textContent=money(adjMonthly);
+  const enhAnnual=enh.reduce((a,r)=>a+r.price,0);
+  const annualValue=adjMonthly*12+enhAnnual;
+  $('enhTotal').style.display=results.length?'':'none';
+  $('enhTotal').innerHTML='+ '+money(enhAnnual)+' extras = <b>'+money(annualValue)+'/yr account value</b>';
+  const siteHrs=results.reduce((a,r)=>a+(r.s.mode==='monthly'?(r.c.onsiteHrs!==undefined?r.c.onsiteHrs:r.c.manHrs):0),0);
+  $('mPerAcre').textContent=siteHrs>0?money2(adjMonthly*12/siteHrs):'$0';
+  const totHrs=results.reduce((a,r)=>a+r.c.manHrs,0);
+  $('mHours').textContent=Math.round(totHrs).toLocaleString();
+  $('mSvcs').textContent=results.length;
+  $('minRow').style.display=minMsg?'':'none';
+  $('minMsg').textContent=minMsg;
+  const ov=parseFloat($('ovMargin').value);
+  const pill=$('marginPill');
+  if(!isNaN(ov)&&ov>0){pill.textContent=ov+'% (override)';pill.className='marginpill hot';}
+  else{const ms=[...new Set(results.map(r=>r.margin))];pill.textContent=ms.length?('auto '+ms.join('/')+'%'):'auto';pill.className='marginpill';}
+  renderShopping(results);
+}
+
+/* ---------- EDUCATION TAB: COVERAGE VS ROUTES ---------- */
+function renderLand(){
+ $('landContent').innerHTML=
+ '<h2>What Exterior Porter Service Is</h2>'
+ +'<p>A porter with a cart, a grabber, a blower and a camera keeps the outside of a property looking managed: litter policed off the lot, walks and beds, exterior cans emptied and relined, dumpster corrals kept decent with the doors actually closed, entries and butt cans hand-picked, spills and graffiti caught and reported with photos. It is the cheapest service on the property and the one every visitor sees first.</p>'
+ +'<h2>The Two Models</h2>'
+ +'<table><tr><th></th><th>Route Visit Program</th><th>Dedicated On-Site Porter</th></tr>'
+ +'<tr><td><b>What it is</b></td><td>A porter truck stops by on a schedule: 15 minutes to an hour per visit depending on the property.</td><td>Your porter, on the property, on a shift.</td></tr>'
+ +'<tr><td><b>Fits</b></td><td>Strip centers, office parks, industrial, HOAs. Most properties.</td><td>Class A retail, resort-adjacent centers, campuses, anywhere presence is the product.</td></tr>'
+ +'<tr><td><b>2026 economics</b></td><td>$30-55 effective per on-site hour with drive time priced in; $35+ minimum per visit. A well-run route clears 20-30 stops in an early-morning shift.</td><td>$25-38 per billed hour in LV, about 10% higher up north. A 4-hour weekday shift runs $2,000-3,500/mo.</td></tr>'
+ +'<tr><td><b>The profit lever</b></td><td>Route density. Every minute of deadhead between stops is unbilled cost.</td><td>Utilization. The porter needs a full task list, not just standing by.</td></tr></table>'
+ +'<h2>What Stays OUT of This Price</h2>'
+ +'<table><tr><th>Work</th><th>Where it goes</th></tr>'
+ +'<tr><td>Mechanical parking lot sweeping (rider and vacuum trucks)</td><td>Its own trade: $0.02-0.10/SF per visit, specialized equipment and a different insurance class. Managed sub, quoted separately.</td></tr>'
+ +'<tr><td>Pressure washing, gum removal, dumpster pad degreasing</td><td>The Pressure Washing calculator. The porter reports it; the pressure crew prices it. Do not double-price the same concrete.</td></tr>'
+ +'<tr><td>Landscaping, weeds, irrigation</td><td>The Landscaping Maintenance calculator.</td></tr>'
+ +'<tr><td>Interior porter and janitorial</td><td>The Bid Calculator.</td></tr>'
+ +'<tr><td>Snow plowing and lot de-icing (NNV)</td><td>Snow contractor. This tool prices entry ice melt only.</td></tr>'
+ +'<tr><td>Hazmat, tires, refrigerant appliances</td><td>Licensed disposal, quoted per event.</td></tr></table>'
+ +'<h2>Las Vegas Realities</h2>'
+ +'<ul>'
+ +'<li><b>The heat rule is law.</b> Nevada OSHA heat illness regulation R131-24AP has been enforced since April 2025. Crews over 10 employees need a written job hazard analysis, a heat illness prevention plan (water, rest, shade, monitoring), and training. Summer routes run roughly 4 to 10 am. Budget the water and the breaks: they are in the supplies line.</li>'
+ +'<li><b>Wind owns the desert.</b> Litter collects on fence lines and desert edges. North Las Vegas, Apex and Henderson industrial parks need perimeter passes, and TRIC is worse.</li>'
+ +'<li><b>Monsoon season, mid-June through September.</b> Fronds, mud at drive aprons, scattered corral overflow. Sell storm passes as an included allowance with a cap.</li>'
+ +'<li><b>Butt cans and entries.</b> Hand-pick zones eat 15-20% of route time on retail. Count them honestly on the walk.</li>'
+ +'</ul>'
+ +'<h2>Northern Nevada Realities</h2>'
+ +'<ul>'
+ +'<li><b>Wages and vendor supply.</b> Porter pay runs close to LV but the pool is thinner and grounds labor costs more. The regional multiplier is not padding: hold it.</li>'
+ +'<li><b>Winter flips the product.</b> Entry ice melt before opening, with timestamped photos that double as slip-and-fall documentation. That log is what the PM shows the insurance carrier.</li>'
+ +'<li><b>Leaf fall spikes October and November.</b> Stop times run long. The catch-up condition setting exists for this.</li>'
+ +'<li><b>Season inverts.</b> LV loses summer afternoons to heat; NNV loses winter mornings to storms. Yearly averages hide both: the incidentals line carries it.</li>'
+ +'</ul>'
+ +'<h2>Contract Structure</h2>'
+ +'<p>One monthly number for the recurring program (route or dedicated), billed as a fixed annual contract divided by 12. Extras (storm passes, hauls, ice melt season, the first clean) price separately and bill when performed. The porter is also the best lead generator on the property: every gum field, stained pad and dirty building he photographs is a pressure washing or landscaping quote waiting to happen.</p>';
+}
+
+/* ---------- EDUCATION TAB: FSM PLAYBOOK ---------- */
+function renderProcess(){
+ $('processContent').innerHTML=
+ '<h2>How to Quote Exterior Porter in 6 Steps</h2>'
+ +'<ol>'
+ +'<li><b>Desk takeoff first (10 minutes).</b> Google Earth: trace the maintained acreage, count the visible cans and corrals, note fence lines against open desert. You now have a budget range.</li>'
+ +'<li><b>Walk the property.</b> Count cans, corrals and hand-pick zones. Judge debris level and condition. Check the back of the pad buildings and the fence lines: that is where the real scope hides.</li>'
+ +'<li><b>Ask the property manager.</b> Frequency expected, gate and badge access, who handles sweeping and snow, what got the last company fired.</li>'
+ +'<li><b>Pick the model.</b> Route visits for most properties. Dedicated shift when they want presence. Both when a big center wants a morning porter plus weekend route stops.</li>'
+ +'<li><b>Check the market flags.</b> Route lands at $30-55 per on-site hour effective; dedicated bills $25-38/hr in LV. Inside the band, send it. Above it, recheck inputs. Below it, hold price.</li>'
+ +'<li><b>Present monthly plus extras.</b> One monthly number, then the storm allowance, haul allowance, ice melt season (NNV), and first clean as their own lines. The extras calendar is what makes us look like operators.</li>'
+ +'</ol>'
+ +'<h2>The Two Takeoffs: Field vs. Desk</h2>'
+ +'<table><tr><th>Input</th><th>Desk method (MAP / ASK)</th><th>Field method (WALK)</th></tr>'
+ +'<tr><td>Maintained acres</td><td>Google Earth polygon. Accurate to a few percent.</td><td>Only needed if the aerial is stale.</td></tr>'
+ +'<tr><td>Cans, corrals, hand-pick zones</td><td>Count what is visible on the aerial; estimate 1 can per pad entry.</td><td>Count them. Ten minutes, real numbers.</td></tr>'
+ +'<tr><td>Debris level + condition</td><td>Street View gives a months-old hint.</td><td>Only the walk tells you. This sets the multiplier and the first-clean project.</td></tr>'
+ +'<tr><td>Frequency, access, exclusions</td><td>Ask the PM. Check who sweeps and who plows.</td><td>Confirm gate hardware and dumpster lock reality on site.</td></tr>'
+ +'<tr><td>Drive minutes</td><td>Map the stop against the rest of the route.</td><td>n/a: this one is pure route planning.</td></tr></table>'
+ +'<p><b>The rule:</b> desk numbers get you a budget range for the first conversation. Walk before you sign. Quoting today? Write "subject to site walk" on it.</p>'
+ +'<h2>Picking the Right Porter Crew</h2>'
+ +'<ul>'
+ +'<li><b>Heat plan first.</b> Nevada OSHA requires a written heat illness prevention plan, water, rest and training for outdoor work. Ask to see it. No plan, no summer route.</li>'
+ +'<li><b>Insurance:</b> GL and workers comp on file. Porter work rides the janitorial comp class; a crew that also does big landscaping or hauling as its main trade carries a more expensive class and prices differently.</li>'
+ +'<li><b>Kit check:</b> reliable truck, backpack blower, cart or barrel, grabbers, PPE, and a phone with a reporting app. The photo log is the deliverable: no photos, no proof, no renewal.</li>'
+ +'<li><b>Route sense:</b> ask how many stops they run and where. A vendor whose route already passes the property prices better than one driving across town.</li>'
+ +'<li><b>Wages:</b> LV porters hire at $15-17, Reno $15.50-18, route drivers and working leads $24-28. A quote implying pay far under that means turnover on your account.</li>'
+ +'</ul>'
+ +'<h2>Pricing It Effectively</h2>'
+ +'<ul>'
+ +'<li><b>Margins auto-set by annual hours (32-40%).</b> Small accounts carry high margin because the truck roll eats them. A full-time dedicated porter wins at 32%.</li>'
+ +'<li><b>Respect the per-visit floor.</b> Nobody profitable rolls a truck for less than $35. Bundle tiny properties into route clusters instead of discounting.</li>'
+ +'<li><b>Drive time is real cost.</b> It is in the build-up on purpose. Tight clusters make the same price more profitable, not cheaper.</li>'
+ +'<li><b>The porter is a scout.</b> Gum fields, stained pads, dirty walls, dead landscaping: every photo is an upsell for the pressure washing and landscaping calculators. Price porter fairly and let the reports sell the rest.</li>'
+ +'<li><b>Never bury catch-up in the monthly.</b> First clean is a project. The route price assumes maintainable.</li>'
+ +'</ul>'
+ +'<h2>Quality Gates Before the Porter Leaves</h2>'
+ +'<ul>'
+ +'<li>Lot, walks, beds and fence lines policed, not just the storefront apron.</li>'
+ +'<li>Every can emptied, relined, lid wiped. Corral doors closed.</li>'
+ +'<li>Entries and butt cans hand-picked.</li>'
+ +'<li>Photo log posted every visit: timestamped, before and after on problem spots. Photos win renewals and kill disputes.</li>'
+ +'</ul>';
+}
+
+/* ---------- RATES & WAGE BOOK TAB ---------- */
+function renderRates(){
+  let rows='';
+  Object.keys(RB).forEach(k=>{
+    const r=RB[k];
+    rows+='<tr><td>'+r.label+(r.note?'<br><span style="font-size:10.5px;color:var(--cw-grey)">'+r.note+'</span>':'')+'</td>'
+    +'<td><input type="number" step="0.01" value="'+r.v+'" onchange="setRB(\''+k+'\',this.value)"></td></tr>';
+  });
+  $('ratesContent').innerHTML=
+  '<h2>Production &amp; Supplies Rate Book</h2>'
+  +'<p>Stop-time anchors come from real route economics (Cleanlots, 40 years of parking lot litter routes) and BSCAI production guidance. Edit any number and it saves to this browser and flows into every build-up. If a rate keeps getting overridden in the field, change it here once.</p>'
+  +'<table><tr><th>Rate</th><th>Value</th></tr>'+rows+'</table>'
+  +'<h2>Regional Porter Wages &amp; Multipliers</h2>'
+  +'<table><tr><th>Region</th><th>Porter $/hr</th><th>Price Multiplier</th><th>Why</th></tr>'
+  +Object.keys(REGIONS).map(k=>{const r=REGIONS[k];return '<tr><td>'+r.label+'</td><td>$'+r.wages.porter.toFixed(2)+'</td><td>x'+r.mult.toFixed(2)+'</td><td>'+r.note+'</td></tr>';}).join('')
+  +'</table>'
+  +'<p style="font-size:11.5px;color:var(--cw-grey)">Wage basis: BLS OEWS May 2025 (LV janitor median $18.90, grounds $18.23; Reno grounds $21.64) against July 2026 day porter postings, which hire below the OEWS medians: Indeed LV day porter average $15.28, ZipRecruiter Reno $15.45. Prepopulated wages sit where crews actually hire and keep people. Route drivers and working supervisors run $24-28.</p>'
+  +'<h2>Rate Factors (matches the Bid Calculator Step 1b)</h2>'
+  +'<table><tr><th>Factor</th><th>Value</th><th>Rule</th></tr>'
+  +'<tr><td>Payroll burden (FICA/FUTA/WC)</td><td>'+(BURDEN*100)+'%</td><td>On top of raw wages, same as the master formula. Porter work rides the janitorial comp class: keep hauling and landscaping out of scope to keep it there.</td></tr>'
+  +'<tr><td>Incidentals &amp; unlisted supplies</td><td>'+(INCIDENTALS*100)+'% of labor</td><td>Room for what nobody itemized: summer heat breaks, a second pass after a windy night.</td></tr>'
+  +'<tr><td>Crew company margin</td><td>'+(IC_MARGIN*100)+'%</td><td>Margin basis, cost divided by 0.92: the crew keeps 8% of their check, exactly like the Bid Calculator IC margin line.</td></tr>'
+  +'<tr><td>City Wide margin</td><td>32-40%</td><td>Auto by annual job hours, divide basis. Override with a reason.</td></tr>'
+  +'<tr><td>Monthly minimum</td><td>'+money(MIN_MONTHLY)+'/mo</td><td>Plus a '+money(RB.minVisit.v)+' floor per route visit. Override needs a reason (bundled account).</td></tr>'
+  +'<tr><td>Pass-throughs</td><td>At cost</td><td>Dump fees, badging, extra disposal: no margin on fees.</td></tr>'
+  +'<tr><td>Crew-provided supplies markup</td><td>'+(VENDOR_MAT_MARKUP*100)+'%</td><td>Their procurement cost when the crew supplies liners and product.</td></tr></table>'
+  +'<h2>Where These Numbers Come From</h2>'
+  +'<table><tr><th>Source</th><th>What it feeds</th></tr>'
+  +'<tr><td>BLS OEWS May 2025 (Las Vegas, Reno, Carson City metros) + 2026 job boards</td><td>Porter and supervisor wages by market. The defensible wage floor.</td></tr>'
+  +'<tr><td>Cleanlots route economics (Brian Winch, 40+ years of parking lot litter routes)</td><td>Stop-time anchors, the $30-50 effective hourly band, and the route density lesson.</td></tr>'
+  +'<tr><td>ISSA / BSCAI benchmarks and production rates</td><td>Labor at 45-55% of revenue, can-servicing times, and the margin sanity check. Our 32-40% margin on crew cost lands inside healthy industry economics.</td></tr>'
+  +'<tr><td>Published 2026 day porter pricing (Universal Site Services, Sunstate, Evergreen, Millennium)</td><td>The $25-38/hr LV dedicated billed band and monthly contract examples.</td></tr>'
+  +'<tr><td>Nevada OSHA heat illness regulation R131-24AP (enforced April 2025)</td><td>The heat plan requirements in the education tabs and the summer supplies line.</td></tr></table>';
+}
+function setRB(k,v){RB[k].v=parseFloat(v)||RB[k].v;
+  const slim={};Object.keys(RB).forEach(kk=>{slim[kk]={v:RB[kk].v};});
+  localStorage.setItem('cwpx_rb',JSON.stringify(slim));recalc();}
+
+/* ---------- TABS ---------- */
+function showTab(t){
+  document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.tab===t));
+  ['quote','land','process','rates'].forEach(k=>{$('tab-'+k).style.display=k===t?'':'none';});
+  if(t==='land')renderLand(); if(t==='process')renderProcess(); if(t==='rates')renderRates();
+}
+
+/* ---------- PRINT & COPY ---------- */
+function printQuote(internal){
+  const results=activeResults();
+  if(!results.length){alert('Turn on at least one service first.');return;}
+  const {adjMonthly}=applyMinimums(results);
+  const region=REGIONS[$('region').value];
+  const acct=$('acct').value||'Client Property';
+  const d=$('qdate').value||new Date().toISOString().slice(0,10);
+  const monthlies=results.filter(r=>r.s.mode==='monthly');
+  const enh=results.filter(r=>r.s.mode!=='monthly');
+  let h='<div class="p-head"><img src="'+LOGO+'"><div class="pt"><b>'+(internal?'Internal Pricing Sheet':'Exterior Porter Investment Recap')+'</b><span>'+acct+' | '+region.label+' | '+d+'</span></div></div>';
+  function svcBlock(r,priceTxt){
+    let x='<div class="p-svc"><span class="p-price">'+priceTxt+'</span><h4>'+r.s.name+'</h4><p>'+r.s.desc+'</p>';
+    if(r.c.detail)x+='<p style="color:var(--cw-grey)">'+r.c.detail+'</p>';
+    if(internal){
+      x+='<table class="p-table"><tr><th>Cost Line</th><th>Amount</th></tr>'
+      +'<tr><td>Porter labor '+r.c.manHrs.toFixed(1)+' hrs @ $'+r.wage.toFixed(2)+' +'+(BURDEN*100)+'% burden</td><td>'+money(r.laborCost)+'</td></tr>'
+      +'<tr><td>Incidentals ('+(INCIDENTALS*100)+'% of labor)</td><td>'+money(r.incCost)+'</td></tr>'
+      +r.c.matLines.map(m=>'<tr><td>'+m.label+'</td><td>'+money(m.cost)+'</td></tr>').join('')
+      +(r.c.extraLines||[]).map(m=>'<tr><td>'+m.label+'</td><td>'+money(m.cost)+'</td></tr>').join('')
+      +'<tr><td>Equipment fee ('+r.c.equipHrs.toFixed(1)+' hrs @ $'+r.equipRate+'/hr)</td><td>'+money(r.equipCost)+'</td></tr>'
+      +'<tr><td><b>'+(r.inhouse?'In-house crew cost':'Crew company total (8% margin basis, Bid Calculator math)')+'</b></td><td><b>'+money(r.totalCost)+'</b></td></tr>'
+      +(r.flatCost?'<tr><td>Pass-through at cost</td><td>'+money(r.flatCost)+'</td></tr>':'')
+      +'<tr><td><b>Margin '+r.margin+'% | Regional x'+region.mult.toFixed(2)+' | '+money2(r.perUnit)+' per '+r.c.unitName+' (market '+money2(r.mktLo)+'-'+money2(r.mktHi)+')</b></td><td><b>'+money(r.price)+'</b></td></tr></table>';
+    }
+    return x+'</div>';
+  }
+  if(monthlies.length){
+    h+='<div class="p-cat">Monthly Exterior Porter Program</div>';
+    monthlies.forEach(r=>{h+=svcBlock(r,money(r.monthly)+'/mo');});
+  }
+  if(enh.length){
+    h+='<div class="p-cat">Extras (billed when performed)</div>';
+    enh.forEach(r=>{h+=svcBlock(r,money(r.price)+(r.s.mode==='peryear'?'/yr':''));});
+  }
+  const enhAnnual=enh.reduce((a,r)=>a+r.price,0);
+  h+='<div class="p-total"><span>Monthly Contract</span><span>'+money(adjMonthly)+'/mo</span></div>';
+  if(enhAnnual)h+='<div class="p-total" style="font-size:13px;border-top:none;margin-top:4px;padding-top:0"><span>Extras Program</span><span>'+money(enhAnnual)+'/yr</span></div>';
+  if(internal&&$('minOverride').checked)h+='<div class="p-note"><b>Minimum override active.</b> Reason: '+($('minReason').value||'not stated')+'</div>';
+  h+='<div class="p-note">'+(internal
+    ?'Internal document. Rate factors match the Bid Calculator: 15% burden, 4% incidentals, 8% crew margin (divide basis). Pass-throughs at cost. Prepared by '+($('prepBy').value||S.user||'')+'.'
+    :'City Wide Facility Solutions manages your exterior program with trained crews, a written heat and safety plan, and a timestamped photo log on every visit. GoCityWide.com')+'</div>';
+  $('printArea').innerHTML=h;
+  window.print();
+}
+function copyQuote(){
+  const results=activeResults();
+  if(!results.length){alert('Turn on at least one service first.');return;}
+  const {adjMonthly}=applyMinimums(results);
+  const region=REGIONS[$('region').value];
+  const monthlies=results.filter(r=>r.s.mode==='monthly');
+  const enh=results.filter(r=>r.s.mode!=='monthly');
+  let t='EXTERIOR PORTER QUOTE | '+($('acct').value||'')+' | '+region.label+'\n';
+  if(monthlies.length){t+='\nMONTHLY PROGRAM\n';monthlies.forEach(r=>{t+='  '+r.s.name+': '+money(r.monthly)+'/mo\n';});t+='  Monthly contract: '+money(adjMonthly)+'/mo\n';}
+  if(enh.length){t+='\nEXTRAS (billed when performed)\n';enh.forEach(r=>{t+='  '+r.s.name+': '+money(r.price)+(r.s.mode==='peryear'?'/yr':'')+'\n';});}
+  t+='\nANNUAL ACCOUNT VALUE: '+money(adjMonthly*12+enh.reduce((a,r)=>a+r.price,0));
+  navigator.clipboard.writeText(t).then(()=>alert('Quote text copied.'));
+}
+
+/* ---------- SAVED WORK (local + cloud) ---------- */
+function snapshot(){return {acct:$('acct').value,qdate:$('qdate').value,prepBy:$('prepBy').value,region:$('region').value,matProvider:$('matProvider').value,laborBy:$('laborBy').value,ovMargin:$('ovMargin').value,minOverride:$('minOverride').checked,minReason:$('minReason').value,svcOn:S.svcOn,inputs:S.inputs};}
+function applySnapshot(p){
+  $('acct').value=p.acct||'';$('qdate').value=p.qdate||'';$('prepBy').value=p.prepBy||'';
+  $('region').value=p.region||'lv';$('matProvider').value=p.matProvider||'vendor';$('laborBy').value=p.laborBy||'vendor';
+  $('ovMargin').value=p.ovMargin||'';$('minOverride').checked=!!p.minOverride;$('minReason').value=p.minReason||'';
+  S.svcOn=p.svcOn||{};S.inputs=p.inputs||{};recalc();
+}
+let saveTimer=null;
+function autosaveSoon(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>localSave(false),1200);}
+function localSave(announce){
+  localStorage.setItem('cwpx_current',JSON.stringify({ts:Date.now(),payload:snapshot()}));
+  if(announce)alert('Saved locally.');
+}
+function saveWork(manual){
+  localSave(false);
+  if(!S.user){changeUser();if(!S.user)return;}
+  const id='px_'+Date.now();
+  const rec={kind:'porter_save',id,user:S.user,name:$('acct').value||'Untitled quote',ts:new Date().toISOString(),payload:snapshot()};
+  fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(rec)})
+   .then(r=>r.json()).then(j=>{if(manual)alert(j&&j.ok?'Saved to the cloud as "'+rec.name+'".':'Cloud save may not have landed. Your work is saved in this browser either way.');})
+   .catch(()=>{if(manual)alert('Cloud save unavailable. Your work is saved in this browser.');});
+}
+function openSaves(){
+  $('saveModal').classList.add('open');
+  $('saveList').innerHTML='<div style="font-size:12px;color:var(--cw-grey)">Loading...</div>';
+  const local=localStorage.getItem('cwpx_current');
+  let html='';
+  if(local){const l=JSON.parse(local);html+=saveRowHtml({id:'local',name:(l.payload.acct||'Current work')+' (this browser)',ts:new Date(l.ts).toLocaleString()},true);}
+  if(!S.user){$('saveList').innerHTML=html+'<div style="font-size:12px;color:var(--cw-grey);padding:8px 0">Set your name to load cloud saves.</div>';return;}
+  fetch(ENDPOINT+'?porter='+encodeURIComponent(S.user)).then(r=>r.json()).then(j=>{
+    const items=(j&&j.items)||[];
+    $('saveList').innerHTML=html+(items.length?items.map(it=>saveRowHtml(it,false)).join(''):'<div style="font-size:12px;color:var(--cw-grey);padding:8px 0">No cloud saves yet for '+S.user+'.</div>');
+    window.__cloudSaves=items;
+  }).catch(()=>{$('saveList').innerHTML=html+'<div style="font-size:12px;color:var(--cw-grey);padding:8px 0">Cloud list unavailable right now.</div>';});
+}
+function saveRowHtml(it,isLocal){
+  return '<div class="saverow"><div class="meta"><b>'+(it.name||it.id)+'</b><span>'+(it.ts||'')+'</span></div>'
+  +'<button onclick="loadWork(\''+it.id+'\','+isLocal+')">Load</button>'
+  +(isLocal?'':'<button class="del" onclick="delWork(\''+it.id+'\')">Delete</button>')+'</div>';
+}
+function loadWork(id,isLocal){
+  if(isLocal){const l=JSON.parse(localStorage.getItem('cwpx_current'));applySnapshot(l.payload);closeSaves();return;}
+  const it=(window.__cloudSaves||[]).find(x=>x.id===id);
+  if(it&&it.payload){applySnapshot(typeof it.payload==='string'?JSON.parse(it.payload):it.payload);closeSaves();}
+}
+function delWork(id){
+  if(!confirm('Delete this cloud save?'))return;
+  fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({kind:'porter_save',id,del:true,user:S.user})}).then(()=>openSaves()).catch(()=>openSaves());
+}
+function closeSaves(){$('saveModal').classList.remove('open')}
+function changeUser(){
+  const n=prompt('Your name (used to store your saved work):',S.user||'');
+  if(n!==null){S.user=n.trim();localStorage.setItem('cwpx_user',S.user);$('userBtn').textContent=S.user||'Set Your Name';}
+}
+
+/* ---------- INIT ---------- */
+(function init(){
+  $('qdate').value=new Date().toISOString().slice(0,10);
+  if(S.user)$('userBtn').textContent=S.user;
+  const cur=localStorage.getItem('cwpx_current');
+  if(cur){try{applySnapshot(JSON.parse(cur).payload);}catch(e){recalc();}}else{recalc();}
+})();
+
+</script>
 </body>
 </html>
